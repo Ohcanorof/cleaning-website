@@ -1,65 +1,128 @@
-import Image from "next/image";
+export default function HomePage(){
+  return(
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        {/* Frame container */}
+        <section className="relative rounded-2xl border-2 border-black p-8">
+          {/* Frame label (like your drawio tab) */}
+          <div className="absolute -top-4 left-6 rounded-md border-2 border-black bg-white px-3 py-1 text-sm font-medium">
+            main page
+          </div>
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          <div className="text-center text-xs font-semibold tracking-wide text-black/70">
+            client side
+          </div>
+
+          {/* Top row: title + menu */}
+          <div className="mt-6 flex flex-col items-center gap-4 md:flex-row md:justify-center">
+            <div className="w-full max-w-md rounded-xl border-2 border-black px-6 py-4 text-center">
+              <div className="text-sm font-medium">title of company</div>
+            </div>
+
+            <div className="w-full max-w-md rounded-xl border-2 border-black px-6 py-4 text-center">
+              <div className="text-sm font-medium">top menu?</div>
+              <div className="mt-2 flex flex-wrap justify-center gap-2 text-xs">
+                <span className="rounded-full border-2 border-black px-3 py-1">
+                  Home
+                </span>
+                <span className="rounded-full border-2 border-black px-3 py-1">
+                  Services
+                </span>
+                <span className="rounded-full border-2 border-black px-3 py-1">
+                  Book
+                </span>
+                <span className="rounded-full border-2 border-black px-3 py-1">
+                  Contact
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Big picture */}
+          <div className="mt-8 rounded-3xl border-2 border-black px-6 py-16 text-center">
+            <div className="text-sm font-medium">picture</div>
+            <div className="mt-2 text-xs text-black/60">
+              (hero image / before &amp; after / banner)
+            </div>
+          </div>
+
+          {/* Services + personal info area */}
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px]">
+            {/* Left: pricing for service list */}
+            <div className="space-y-5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-6">
+                  <div className="flex-1 rounded-xl border-2 border-black px-6 py-6">
+                    <div className="text-sm font-medium">pricing for service</div>
+                    <div className="mt-2 text-xs text-black/60">
+                      (service name • description • price)
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="h-14 w-14 rounded-full border-2 border-black bg-white text-xs font-semibold"
+                  >
+                    select
+                    <br />
+                    (button)
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Right: personal info box */}
+            <div className="rounded-2xl border-2 border-black p-6">
+              <div className="text-center text-sm font-medium">
+                enter personal info
+              </div>
+
+              <div className="mt-5 space-y-3">
+                {["Name", "Phone", "Email", "Address"].map((label) => (
+                  <div
+                    key={label}
+                    className="rounded-lg border-2 border-black px-3 py-3 text-xs text-black/70"
+                  >
+                    {label} (placeholder)
+                  </div>
+                ))}
+
+                <div className="rounded-lg border-2 border-black px-3 py-10 text-xs text-black/70">
+                  Notes (pets, gate code, etc.)
+                </div>
+
+                <button
+                  type="button"
+                  className="mt-2 w-full rounded-xl border-2 border-black bg-white px-4 py-3 text-sm font-semibold"
+                >
+                  Reserve (placeholder)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* About / links */}
+          <div className="mt-10 rounded-2xl border-2 border-black px-6 py-10 text-center">
+            <div className="text-sm font-medium">
+              about section / links to other sites (social media pages)
+            </div>
+            <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
+              <span className="rounded-full border-2 border-black px-4 py-2">
+                Instagram
+              </span>
+              <span className="rounded-full border-2 border-black px-4 py-2">
+                Facebook
+              </span>
+              <span className="rounded-full border-2 border-black px-4 py-2">
+                Reviews
+              </span>
+              <span className="rounded-full border-2 border-black px-4 py-2">
+                Contact
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }
