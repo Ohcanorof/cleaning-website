@@ -4,22 +4,21 @@ export default function HomePage(){
   return(
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        {/* Frame container */}
-        <section className="relative rounded-2xl border-2 border-transparent p-8">
-          {/*<div className="text-center text-xs font-semibold tracking-wide text-black/70">
-            client side
-          </div>*/}
-
-          {/* Top row: title + menu */}
-          <div className="mt-6 flex flex-col items-center gap-4 md:flex-row md:justify-center">
-            <div className="w-full max-w-md rounded-xl border-2 border-black px-6 py-4 text-center">
-              <div className="text-sm text-black/70 font-medium">Cleaning Services</div>
+        <section className="rounded-2xl border-2 border-transparent p-2 sm:p-6">
+          {/* Header (keep as its own block; NOT inside a grid) */}
+          <header className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="w-full sm:w-auto rounded-xl border-2 border-black px-6 py-4 text-center">
+              <div className="text-sm text-black/70 font-medium">
+                Cleaning Services
+              </div>
             </div>
 
-            {/*menu bar */}
-            <div className="w-full max-w-md rounded-xl border-2 border-black px-6 py-4 text-center">
-              <div className="mt-2 flex flex-wrap justify-center gap-2 text-xs">
-                <Link href="/" className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition">
+            <nav className="w-full sm:w-auto rounded-xl border-2 border-black px-4 py-3">
+              <div className="flex flex-wrap justify-center gap-2 text-xs">
+                <Link
+                  href="/"
+                  className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                >
                   Home
                 </Link>
 
@@ -38,16 +37,16 @@ export default function HomePage(){
                 </Link>
 
                 <Link
-                  href="/#About Us"
+                  href="/#about"
                   className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
-                  About Us
+                  About
                 </Link>
               </div>
-            </div>
-          </div>
+            </nav>
+          </header>
 
-          {/* Big picture */}
+          {/* Hero / picture */}
           <div className="mt-8 rounded-3xl border-2 border-black px-6 py-16 text-center">
             <div className="text-sm text-black/70 font-medium">picture</div>
             <div className="mt-2 text-xs text-black/60">
@@ -55,74 +54,79 @@ export default function HomePage(){
             </div>
           </div>
 
-          {/* Services + personal info area */}
-          <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px]">
-            {/* Left: pricing for service list */}
-            <div className="space-y-5">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-6">
-                  <div className="flex-1 rounded-xl border-2 border-black px-6 py-6">
-                    <div className="text-sm text-black/70 font-medium">pricing for service</div>
-                    <div className="mt-2 text-xs text-black/60">
-                      (First time cleaning • description • price)
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="h-14 w-14 rounded-full border-2 border-black bg-white text-xs text-black/70 font-semibold"
-                  >
-                    select
-                    <br />
-                    (button)
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Right: personal info box */}
-            <div className="rounded-2xl border-2 border-black p-6">
-              <div className="text-center text-sm text-black/70 font-medium">
-                enter personal info
+          {/* Services list (no side buttons; stacked on all sizes) */}
+          <section id="services" className="mt-10">
+            <div className="rounded-2xl border-2 border-black px-6 py-6">
+              <div className="text-sm text-black/70 font-medium">Services</div>
+              <div className="mt-2 text-xs text-black/60">
+                (list of services + descriptions)
               </div>
 
-              <div className="mt-5 space-y-3">
-                {["Name", "Phone", "Email", "Address"].map((label) => (
+              <div className="mt-6 space-y-4">
+                {[
+                  {
+                    title: "Standard Cleaning",
+                    desc: "General cleaning for bedrooms, bathrooms, kitchen, living areas.",
+                  },
+                  {
+                    title: "Deep Cleaning",
+                    desc: "More detailed cleaning: baseboards, appliances, buildup removal, etc.",
+                  },
+                  {
+                    title: "Move In / Move Out",
+                    desc: "Empty-unit cleaning, inside cabinets, detailed reset for new tenants.",
+                  },
+                ].map((s) => (
                   <div
-                    key={label}
-                    className="rounded-lg border-2 border-black px-3 py-3 text-xs text-black/70"
+                    key={s.title}
+                    className="rounded-xl border-2 border-black px-5 py-4"
                   >
-                    {label} (placeholder)
+                    <div className="text-sm text-black/70 font-medium">
+                      {s.title}
+                    </div>
+                    <div className="mt-1 text-xs text-black/60">{s.desc}</div>
                   </div>
                 ))}
 
-                <div className="rounded-lg border-2 border-black px-3 py-10 text-xs text-black/70">
-                  Notes (pets, gate code, etc.)
+                <div className="pt-2">
+                  <Link
+                    href="/booking"
+                    className="inline-block rounded-xl border-2 border-black bg-white px-4 py-3 text-sm text-black/70 font-semibold hover:bg-black hover:text-white transition"
+                  >
+                    Go to Booking →
+                  </Link>
                 </div>
-
-                <button
-                  type="button"
-                  className="mt-2 w-full rounded-xl border-2 border-black bg-white px-4 py-3 text-sm text-black/70 font-semibold">
-                  Reserve (placeholder)
-                </button>
               </div>
             </div>
-          </div>
+          </section>
 
           {/* About / links */}
-          <div className="mt-10 rounded-2xl border-2 border-black px-6 py-10 text-center">
+          <section id="about" className="mt-10 rounded-2xl border-2 border-black px-6 py-10 text-center">
             <div className="text-sm text-black/70 font-medium">
               about section / links to other sites (social media pages)
             </div>
+
             <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
-              <Link href="https://www.instagram.com/patriciashousecleaningservice/" className="rounded-full border-2 border-black text-black/70 px-4 py-2">
+              <Link
+                href="https://www.instagram.com/patriciashousecleaningservice/"
+                className="rounded-full border-2 border-black text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
+                target="_blank"
+              >
                 Instagram
               </Link>
-              <span className="rounded-full border-2 border-black text-black/70 px-4 py-2">
+
+              <Link
+                href="/#contact"
+                className="rounded-full border-2 border-black text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
+              >
                 Contact
-              </span>
+              </Link>
             </div>
-          </div>
+
+            <div id="contact" className="mt-6 text-xs text-black/60">
+              (contact info placeholder — phone/email/service area)
+            </div>
+          </section>
         </section>
       </div>
     </main>
