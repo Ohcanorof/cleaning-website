@@ -1,3 +1,69 @@
+# Cleaning Company Booking Site + Owner Dashboard (Next.js) — Work In Progress
+
+A reservation/booking website for a cleaning business. Customers submit a reservation request, the owner gets an email notification, and a secure owner-only dashboard (in progress) will show all active reservations and basic analytics.
+
+---
+
+## Tech Stack
+- **Next.js** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Supabase** (Database + Auth planned/used for owner access)
+- **JSON** (used for data interchange/config where applicable)
+
+---
+
+## What this project does
+### Customer
+1. Customer fills out a reservation form
+2. The system sends an email notification to the owner (Gmail)
+3. (In progress) Reservation is stored in Supabase and becomes viewable in the owner dashboard
+
+### Owner (in progress)
+- Owner logs in to a protected route (ex: `/owner`)
+- Owner can view active reservations and manage statuses
+
+---
+
+## Current Status
+
+### ✅ Completed
+- Reservation request form (basic booking flow)
+- Email notification on new reservation
+  - Email subject shows: **“New Reservation”**
+- Environment variables configured for deployment (Vercel)
+
+### 🚧 Under Development
+- **Supabase database integration**
+  - Persist reservation submissions
+- **Owner dashboard** (ex: `/owner`)
+  - View active reservations
+  - Basic filtering/sorting (planned)
+- **Security for owner dashboard**
+  - Owner-only access (likely Supabase Auth + route protection)
+
+### 🧠 Planned / Next Up
+- Reservation lifecycle/status workflow
+  - Example: `Pending` → `Confirmed` → `Completed` / `Canceled`
+- Analytics metrics (owner view)
+  - Example: total requests, upcoming jobs, completed jobs, cancellations, etc.
+- Customer simplicity decision
+  - **No customer accounts**: give customers a reservation/request ID for lookup
+  - **Optional accounts**: customers can log in to view/manage their reservations
+  - (need feedback on this)
+- Overall site look and feel (beautification)
+  - Interaction animations, transitions, and overall site view will change with feedback.
+
+---
+
+
+
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
