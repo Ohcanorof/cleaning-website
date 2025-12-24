@@ -1,7 +1,7 @@
 "use client"; 
 
-{/* this is what the customer should see after they click on a service to book*/}
-{/*cleint component*/}
+//this is what the customer should see after they click on a service to book
+//cleint component
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
