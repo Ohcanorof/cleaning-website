@@ -53,7 +53,8 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
   - (need feedback on this)
 - Overall site look and feel (beautification)
   - Interaction animations, transitions, and overall site view will change with feedback.
-
+- Owner additions
+  - Need to include the owner's email to the supabase project so they can have access when things are finished.
 ---
 
 
