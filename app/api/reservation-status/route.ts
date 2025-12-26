@@ -13,7 +13,7 @@ export async function PATCH(req: Request){
             return Response.json({error: "Missing id or status."}, {status: 400});
         }
 
-        const allowed = new Set(["NEW", "CONFIRMED", "COMPLETED", "CANCELLED"]);
+        const allowed = new Set(["NEW", "CONFIRMED", "COMPLETED", "CANCELED"]);
         if(!allowed.has(body.status)){
             return Response.json({error: "Invalid status."}, {status: 400});
         }

@@ -28,113 +28,183 @@ type ReservationPayload = {
 }
 
 //email route four reservations
-export async function POST(req: Request){
-    try{
-        const body = (await req.json()) as ReservationPayload;
+export async function POST(req: Request) {
+  try {
+    const body = (await req.json()) as ReservationPayload;
 
-        //honeypot for bots
-        if (body.website) return Response.json({
-            ok: true
-        });
+    //honeypot
+    if (body.website) return Response.json({ ok: true });
 
-        //actual required checks for the user input
-        if(!body.serviceId || !body.serviceName ||typeof body.servicePrice !== "number" || !body.fullName || !body.phone || !body.email || !body.address){
-            return Response.json(
-                {error: "Missing required fields."}, 
-                {status: 400}
-            );
-        }
-
-        //generating the confirmation codde
-        const confirmationCode = makeCode(8);
-
-        //save it to Supabase
-        const supabase = await createClient();
-        const {error: insertError} = await supabase.from("reservations").insert({
-            status: "NEW",
-            confirmation_code: confirmationCode,
-            service_id: body.serviceId,
-            service_name: body.serviceName,
-            service_price: body.servicePrice,
-            service_description: body.serviceDescription ?? null,
-
-            requested_date: body.requestedDate ? body.requestedDate : null,
-            time_window: body.timeWindow ?? null,
-            notes: body.notes ?? null,
-
-            full_name: body.fullName,
-            phone: body.phone,
-            email: body.email,
-            address: body.address,
-        });
-
-        if (insertError){
-            console.error("Database insert error:", insertError);
-            return Response.json({error: "Failed to save the reservation."}, { status: 500 });
-        }
-
-        const resendKey = process.env.RESEND_API_KEY;
-        const ownerEmail = process.env.OWNER_EMAIL;
-        
-        //required checks for api and owners email
-        if(!resendKey || !ownerEmail){
-            return Response.json(
-                {error: "Missing RESEND_API_KEY or OWNER_EMAIL."},
-                {status: 500}
-            );
-        }
-
-        const resend = new Resend(resendKey);
-        //will alwyas be the subject line in emails
-        const subject = `New Reservation: ${body.serviceName} ($${Number(body.servicePrice).toFixed(2)})`;
-        //the actual email body
-        const html = `
-            <h2>New Reservation</h2>
-            <p><strong>Confirmation Code:</strong> ${escapeHtml(confirmationCode)}</p>
-            <hr/>
-            <p><strong>Service:</strong> ${escapeHtml(body.serviceName)}</p>
-            <p><strong>Price:</strong> $${Number(body.servicePrice).toFixed(2)}</p>
-            <p><strong>Description:</strong> ${escapeHtml(body.serviceDescription ?? "")}</p>
-            <hr/>
-            <p><strong>Requested Date:</strong> ${escapeHtml(body.requestedDate ?? "")}</p>
-            <p><strong>Time Window:</strong> ${escapeHtml(body.timeWindow ?? "")}</p>
-            <p><strong>Notes:</strong><br/>${escapeHtml(body.notes ?? "").replace(/\n/g, "<br/>")}</p>
-            <hr/>
-            <h3>Customer Info</h3>
-            <p><strong>Name:</strong> ${escapeHtml(body.fullName)}</p>
-            <p><strong>Phone:</strong> ${escapeHtml(body.phone)}</p>
-            <p><strong>Email:</strong> ${escapeHtml(body.email)}</p>
-            <p><strong>Address:</strong> ${escapeHtml(body.address)}</p>
-            `;
-
-        const {error: emailError} = await resend.emails.send({
-            from: "Reservations <onboarding@resend.dev>",
-            to: ownerEmail,
-            replyTo: body.email,
-            subject,
-            html,
-        });
-
-        if(emailError){
-            //reservation is already saved, so ret success w/ a warning
-            console.error("Resend error:", emailError);
-            return Response.json(
-                {ok: true, confirmationCode, warning: "Saved to DB, but email failed to send." },
-                { status: 200 }
-            );
-        }
-
-        return Response.json({ok: true, confirmationCode});
-    }catch (e){
-        return Response.json({error: "Invalid request."}, {status: 400});
+    //required fields
+    if (
+      !body.fullName ||
+      !body.phone ||
+      !body.email ||
+      !body.address ||
+      !body.serviceId ||
+      !body.serviceName
+    ) {
+      return Response.json({ error: "Missing required fields." }, { status: 400 });
     }
+
+    const resendKey = process.env.RESEND_API_KEY;
+    const ownerEmail = process.env.OWNER_EMAIL;
+    const fromEmail = process.env.RESEND_FROM || "Reservations <onboarding@resend.dev>";
+
+    if (!resendKey || !ownerEmail) {
+      return Response.json(
+        { error: "Missing RESEND_API_KEY or OWNER_EMAIL." },
+        { status: 500 }
+      );
+    }
+
+    const supabase = await createClient();
+
+    //create a reservation confirmation code
+    const confirmationCode = await generateUniqueCode(supabase);
+
+    //1) Insert into DB
+    //Make sure your reservations table includes confirmation_code
+    const { error: insertErr } = await supabase.from("reservations").insert({
+      status: "NEW",
+      confirmation_code: confirmationCode,
+
+      service_id: body.serviceId,
+      service_name: body.serviceName,
+      service_price: body.servicePrice,
+      service_description: body.serviceDescription ?? null,
+
+      requested_date: body.requestedDate || null,
+      time_window: body.timeWindow || null,
+      notes: body.notes || null,
+
+      full_name: body.fullName,
+      phone: body.phone,
+      email: body.email,
+      address: body.address,
+    });
+
+    if (insertErr) {
+      console.error("Supabase insert error:", insertErr);
+      return Response.json({ error: "Failed to save reservation." }, { status: 500 });
+    }
+
+    const resend = new Resend(resendKey);
+
+    //2) Email owner
+    const ownerSubject = `New Reservation: ${body.serviceName} ($${Number(body.servicePrice).toFixed(
+      2
+    )}) [${confirmationCode}]`;
+
+    const ownerHtml = `
+      <h2>New Reservation</h2>
+      <p><strong>Confirmation Code:</strong> ${escapeHtml(confirmationCode)}</p>
+      <p><strong>Service:</strong> ${escapeHtml(body.serviceName)}</p>
+      <p><strong>Price:</strong> $${Number(body.servicePrice).toFixed(2)}</p>
+      <p><strong>Description:</strong> ${escapeHtml(body.serviceDescription ?? "")}</p>
+      <hr/>
+      <p><strong>Requested Date:</strong> ${escapeHtml(body.requestedDate ?? "")}</p>
+      <p><strong>Time Window:</strong> ${escapeHtml(body.timeWindow ?? "")}</p>
+      <p><strong>Notes:</strong><br/>${escapeHtml(body.notes ?? "").replace(/\n/g, "<br/>")}</p>
+      <hr/>
+      <h3>Customer Info</h3>
+      <p><strong>Name:</strong> ${escapeHtml(body.fullName)}</p>
+      <p><strong>Phone:</strong> ${escapeHtml(body.phone)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(body.email)}</p>
+      <p><strong>Address:</strong> ${escapeHtml(body.address)}</p>
+    `;
+
+    const ownerSend = await resend.emails.send({
+      from: fromEmail,
+      to: ownerEmail,
+      replyTo: body.email,
+      subject: ownerSubject,
+      html: ownerHtml,
+    });
+
+    if (ownerSend.error) {
+      console.error("Resend owner email error:", ownerSend.error);
+      return Response.json({ error: "Owner email failed to send." }, { status: 502 });
+    }
+
+    //3) Email customer (receipt)
+    const customerSubject = `Reservation received: ${body.serviceName} [${confirmationCode}]`;
+
+    const customerHtml = `
+      <h2>We received your reservation request ✅</h2>
+      <p>Thanks, ${escapeHtml(body.fullName)}!</p>
+
+      <p><strong>Confirmation Code:</strong> ${escapeHtml(confirmationCode)}</p>
+
+      <hr/>
+      <p><strong>Service:</strong> ${escapeHtml(body.serviceName)}</p>
+      <p><strong>Estimated Price:</strong> $${Number(body.servicePrice).toFixed(2)}</p>
+      <p><strong>Requested Date:</strong> ${escapeHtml(body.requestedDate ?? "(not provided)")}</p>
+      <p><strong>Time Window:</strong> ${escapeHtml(body.timeWindow ?? "(not provided)")}</p>
+      ${body.notes ? `<p><strong>Your Notes:</strong><br/>${escapeHtml(body.notes).replace(/\n/g,"<br/>")}</p>` : ""}
+
+      <hr/>
+      <p><strong>Payment:</strong> Cash (for now)</p>
+      <p>
+        The owner will call/text to confirm your reservation about 1 day in advance.
+        If you need to update anything, reply to this email and include your confirmation code.
+      </p>
+    `;
+
+    const customerSend = await resend.emails.send({
+      from: fromEmail,
+      to: body.email,
+      replyTo: ownerEmail, //customer replies go to owner
+      subject: customerSubject,
+      html: customerHtml,
+    });
+
+    //If customer email fails, we still keep the reservation + owner email succeeded.
+    if (customerSend.error) {
+      console.error("Resend customer email error:", customerSend.error);
+      return Response.json({
+        ok: true,
+        confirmationCode,
+        customerEmailSent: false,
+      });
+    }
+
+    return Response.json({
+      ok: true,
+      confirmationCode,
+      customerEmailSent: true,
+    });
+  } catch (e) {
+    return Response.json({ error: "Invalid request." }, { status: 400 });
+  }
 }
 
-function makeCode(len: number){
+function makeCode(){
     const chars ="ABCDEFGHJKLMNPQRSTUVWXYZ23456789" //will help avoid the O/0 and I/1 confusion
     let out = "";
-    for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+    for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
     return out;
+}
+
+async function generateUniqueCode(supabase: any){
+      for (let i = 0; i < 8; i++) {
+    const code = makeCode();
+    const { data, error } = await supabase
+      .from("reservations")
+      .select("id")
+      .eq("confirmation_code", code)
+      .maybeSingle();
+
+    if (error) {
+      //If this errors, we can still attempt insert and let unique index enforce
+      return code;
+    }
+
+    if (!data) return code;
+  }
+
+  //a fallback
+  return makeCode() + makeCode();
 }
 
 function escapeHtml(input: string){
