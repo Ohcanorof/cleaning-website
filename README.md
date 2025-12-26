@@ -32,29 +32,30 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
 - Email notification on new reservation
   - Email subject shows: **“New Reservation”**
 - Environment variables configured for deployment (Vercel)
+- **Supabase integration**
+  - Postgres table to persist reservations
+  - Row Level Security (RLS) policies for safe access
+- **Owner Dashboard** (`/owner`)
+  - **Secured with Supabase Auth + admin whitelist** (only approved users can access it)
+  - View reservations from the database
+  - Filter by status + search (name/phone/email/address/code/service)
+  - Update reservation status (Confirm / Complete / Cancel)
 
 ### 🚧 Under Development
-- **Supabase database integration**
-  - Persist reservation submissions
-- **Owner dashboard** (ex: `/owner`)
-  - View active reservations
-  - Basic filtering/sorting (planned)
-- **Security for owner dashboard**
-  - Owner-only access (likely Supabase Auth + route protection)
+- Dashboard UX improvements (small polish items)
+  - Better “status label” text depending on the selected filter
+  - Cleaner formatting / layout refinements based on feedback
 
 ### 🧠 Planned / Next Up
-- Reservation lifecycle/status workflow
-  - Example: `Pending` → `Confirmed` → `Completed` / `Canceled`
-- Analytics metrics (owner view)
-  - Example: total requests, upcoming jobs, completed jobs, cancellations, etc.
-- Customer simplicity decision
-  - **No customer accounts**: give customers a reservation/request ID for lookup
-  - **Optional accounts**: customers can log in to view/manage their reservations
-  - (need feedback on this)
-- Overall site look and feel (beautification)
-  - Interaction animations, transitions, and overall site view will change with feedback.
-- Owner additions
-  - Need to include the owner's email to the supabase project so they can have access when things are finished.
+- Owner logout button (so the owner can sign out without clearing cookies)
+- Pagination / “Load more” for reservations (when the list grows)
+- More sorting controls (ex: requested date vs created date)
+- Calendar-style view (weekly schedule)
+- Customer confirmation email (most likely will add this)
+- Owner email notification improvements
+  - Include confirmation code and a direct dashboard link
+- Owner onboarding
+  - Add the owner’s Supabase Auth user + whitelist their UUID in the `admins` table
 ---
 
 
