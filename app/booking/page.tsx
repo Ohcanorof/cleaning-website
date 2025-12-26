@@ -12,7 +12,7 @@ type Service = {
   description: string;
 };
 
- {/*this could change depending on what the services actually are. This is just a placeholder*/}
+ //this could change depending on what the services actually are. This is just a placeholder
 const SERVICES: Service[] = [
   {
     id: "standard",
@@ -108,8 +108,15 @@ export default function BookingPage() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error ?? "Failed to submit reservation.");
 
+      const code = data?.confirmationCode as string | undefined;
+
       setStatus("success");
-      setMessage("Reservation submitted! The owner will call/text to confirm about 1 day in advance.");
+      setMessage(
+      code
+        ? `Reservation submitted! Confirmation code: ${code}. The owner will call/text to confirm about 1 day in advance.`
+        : "Reservation submitted! The owner will call/text to confirm about 1 day in advance."
+    );
+    //could make it 
     } catch (err: any) {
       setStatus("error");
       setMessage(err?.message ?? "Something went wrong.");
@@ -289,9 +296,18 @@ export default function BookingPage() {
                 </button>
 
                 {message ? (
-                  <p className={`pt-2 text-center text-xs ${status === "error" ? "text-red-600" : "text-black/60"}`}>
+                  <div
+                    className={`pt-3 text-center text-xs ${
+                      status === "error" ? "text-red-600" : "text-black/70"
+                    }`}
+                  >
                     {message}
-                  </p>
+                    {status === "success" && message.includes("Confirmation code:") ? (
+                      <div className="mt-2 inline-block rounded-lg border-2 border-black px-3 py-2 text-sm font-semibold text-black/80">
+                        {message.split("Confirmation code: ")[1]?.split(".")[0]}
+                      </div>
+                    ) : null}
+                  </div>
                 ) : (
                   <p className="pt-2 text-center text-xs text-black/60">
                     You will receive a call/text to confirm about 1 day in advance.
