@@ -28,35 +28,40 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
 ## Current Status
 
 ### ✅ Completed
-- Reservation request form (basic booking flow)
-- Email notification on new reservation
-  - Email subject shows: **“New Reservation”**
-- Environment variables configured for deployment (Vercel)
+- Customer booking page (`/booking`)
+  - Service selection + price display
+  - Customer info fields (name/phone/email/address) + optional notes
+  - Honeypot field for basic bot reduction
+- Email notification on new reservation (Resend → Gmail)
+- Vercel deployment + environment variables configured
 - **Supabase integration**
-  - Postgres table to persist reservations
-  - Row Level Security (RLS) policies for safe access
-- **Owner Dashboard** (`/owner`)
-  - **Secured with Supabase Auth + admin whitelist** (only approved users can access it)
-  - View reservations from the database
-  - Filter by status + search (name/phone/email/address/code/service)
-  - Update reservation status (Confirm / Complete / Cancel)
+  - `reservations` table for persistence
+  - Row Level Security (RLS) policies
+- **Owner dashboard** (`/owner`)
+  - Secured with **Supabase Auth + admin whitelist** (`admins` table)
+  - Reservation list view with:
+    - Status filters (active/new/confirmed/completed/canceled/all)
+    - Search (name/phone/email/address/code/service)
+    - Sorting (created date + requested date)
+    - Pagination
+  - Weekly calendar view (schedule-style view by requested date)
+  - Status management (Confirm / Complete / Cancel) via API route
 
 ### 🚧 Under Development
-- Dashboard UX improvements (small polish items)
-  - Better “status label” text depending on the selected filter
-  - Cleaner formatting / layout refinements based on feedback
+- Dashboard UX polish
+  - Improve labels/wording depending on filters/views
+  - Cleaner layout and spacing refinements
+- Calendar view refinement
+  - Always render the full week grid even when there are zero jobs that week
+- Owner logout button (sign out without clearing cookies)
 
 ### 🧠 Planned / Next Up
-- Owner logout button (so the owner can sign out without clearing cookies)
-- Pagination / “Load more” for reservations (when the list grows)
-- More sorting controls (ex: requested date vs created date)
-- Calendar-style view (weekly schedule)
-- Customer confirmation email (most likely will add this)
-- Owner email notification improvements
-  - Include confirmation code and a direct dashboard link
+- Customer confirmation email (receipt + confirmation code)
+  - Improve deliverability by verifying a sender/domain in Resend
+- Owner email improvements
+  - Include confirmation code consistently + possibly a direct dashboard link
 - Owner onboarding
   - Add the owner’s Supabase Auth user + whitelist their UUID in the `admins` table
----
 
 
 
