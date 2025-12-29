@@ -28,15 +28,32 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
 ## Current Status
 
 ### ✅ Completed
-- Customer booking page (`/booking`)
-  - Service selection + price display
+
+- Customer quote request page (`/booking`)
+  - Service selection with **estimated price range** (min–max)
   - Customer info fields (name/phone/email/address) + optional notes
+  - Preferred quote date + time window
   - Honeypot field for basic bot reduction
-- Email notification on new reservation (Resend → Gmail)
+  - **Server-side validation + normalization**
+    - Clamped string lengths, basic email validation, phone normalization
+    - Price range validation (min ≤ max, bounds checking)
+
+- Email notifications (Resend)
+  - Owner email on new quote request (includes confirmation code + estimated range)
+  - Customer confirmation email (receipt with confirmation code + estimated range)
+
 - Vercel deployment + environment variables configured
+
 - **Supabase integration**
   - `reservations` table for persistence
-  - Row Level Security (RLS) policies
+  - Pricing fields to support quote workflow:
+    - `service_min_price`, `service_max_price` (estimated range)
+    - `final_price` (entered by owner after job is completed/paid)
+  - Row Level Security (RLS)
+    - Admin-only read/update/delete via `admins` whitelist table
+    - **Hardened public insert policy** so public users can only create `NEW` requests
+      - Prevents bypass inserts like `COMPLETED` or pre-setting `final_price`
+
 - **Owner dashboard** (`/owner`)
   - Secured with **Supabase Auth + admin whitelist** (`admins` table)
   - Reservation list view with:
@@ -44,24 +61,45 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
     - Search (name/phone/email/address/code/service)
     - Sorting (created date + requested date)
     - Pagination
+    - Displays **Final price charged** when a reservation is completed
   - Weekly calendar view (schedule-style view by requested date)
-  - Status management (Confirm / Complete / Cancel) via API route
+    - Always renders full week grid even when there are zero requests
+  - Status management via API route:
+    - Confirm / Complete (requires final price) / Cancel
+    - **Server-enforced status transitions** (NEW → CONFIRMED → COMPLETED, etc.)
+  - Owner logout button
+
+---
 
 ### 🚧 Under Development
+
 - Dashboard UX polish
   - Improve labels/wording depending on filters/views
-  - Cleaner layout and spacing refinements
-- Calendar view refinement
-  - Always render the full week grid even when there are zero jobs that week
-- Owner logout button (sign out without clearing cookies)
+  - Cleaner layout/spacing refinements
+  - Replace `prompt()` final price entry with a nicer modal/input UI
+
+---
 
 ### 🧠 Planned / Next Up
-- Customer confirmation email (receipt + confirmation code)
-  - Improve deliverability by verifying a sender/domain in Resend
-- Owner email improvements
-  - Include confirmation code consistently + possibly a direct dashboard link
-- Owner onboarding
-  - Add the owner’s Supabase Auth user + whitelist their UUID in the `admins` table
+
+- **Database constraints (hardening)**
+  - Add Postgres `CHECK` constraints for:
+    - Allowed statuses
+    - Price bounds + range validity
+    - Length constraints for name/email/address/notes
+  - (Optional) Move to an enum type for status
+
+- **Anti-spam / abuse protection**
+  - Rate limiting and/or CAPTCHA (Cloudflare Turnstile / hCaptcha)
+  - Optional: basic duplicate detection (same phone/email within X minutes)
+
+- Email deliverability improvements
+  - Verify domain/sender in Resend for better inbox placement
+  - Owner email enhancements (direct dashboard link, cleaner formatting)
+
+- Owner onboarding / production readiness
+  - Add owner’s Supabase Auth user + whitelist UUID in `admins`
+  - Purchase + connect a custom domain (and set up DNS/email sender alignment)
 
 
 
