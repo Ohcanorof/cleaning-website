@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 //this is what the customer should see after they click on a service to book
 //cleint component
@@ -8,33 +8,36 @@ import { useMemo, useState } from "react";
 type Service = {
   id: string;
   name: string;
-  price: number;
+  maxPrice: number;
+  minPrice: number;
   description: string;
 };
 
- //this could change depending on what the services actually are. This is just a placeholder
+//this could change depending on what the services actually are. This is just a placeholder
 const SERVICES: Service[] = [
   {
     id: "standard",
     name: "Standard Cleaning",
-    price: 120,
+    minPrice: 140,
+    maxPrice: 160,
     description: "General cleaning for common areas and bedrooms/bathrooms.",
-  },  
+  },
   {
     id: "deep",
     name: "Deep Cleaning",
-    price: 220,
-    description: "More detailed cleaning for buildup, edges, and appliances.",
+    minPrice: 285,
+    maxPrice: 375,
+    description: "More detailed cleaning for buildup and hard-to-reach areas.",
   },
   {
     id: "move",
-    name: "Move In / Move Out",
-    price: 300,
-    description: "Empty-unit cleaning, detailed reset, inside cabinets (as needed).",
+    name: "Move In/Move Out",
+    minPrice: 340,
+    maxPrice: 520,
+    description: "A thorough clean for moving in or out.",
   },
 ];
 
-//user input stuff
 type FormState = {
   serviceId: string;
   requestedDate: string;
@@ -44,9 +47,9 @@ type FormState = {
   phone: string;
   email: string;
   address: string;
-  //should help against bots 
+  //should help against bots
   website: string;
-}
+};
 
 export default function BookingPage() {
   const [form, setForm] = useState<FormState>({
@@ -61,13 +64,14 @@ export default function BookingPage() {
     website: "",
   });
 
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const [message, setMessage] = useState<string>("");
+  const selected = useMemo(() => {
+    return SERVICES.find((s) => s.id === form.serviceId) ?? SERVICES[0];
+  }, [form.serviceId]);
 
-  const selected = useMemo(
-    () => SERVICES.find((s) => s.id === form.serviceId) ?? SERVICES[0],
-    [form.serviceId]
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
+    "idle"
   );
+  const [message, setMessage] = useState<string>("");
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -78,30 +82,31 @@ export default function BookingPage() {
     setStatus("submitting");
     setMessage("");
 
-    // basic client-side checks (server will re-check this too)
-    if (!form.fullName || !form.phone || !form.email || !form.address) {
-      setStatus("error");
-      setMessage("Please fill in: full name, phone, email, and address.");
-      return;
-    }
-
     try {
       const res = await fetch("/api/reservation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          serviceId: form.serviceId,
+          //service info
+          serviceId: selected.id,
           serviceName: selected.name,
-          servicePrice: selected.price,
+          serviceMinPrice: selected.minPrice,
+          serviceMaxPrice: selected.maxPrice,
           serviceDescription: selected.description,
+
+          //quote request
           requestedDate: form.requestedDate,
           timeWindow: form.timeWindow,
           notes: form.notes,
+
+          //user info
           fullName: form.fullName,
           phone: form.phone,
           email: form.email,
           address: form.address,
-          website: form.website, // honeypot
+
+          //honeypot
+          website: form.website,
         }),
       });
 
@@ -112,11 +117,10 @@ export default function BookingPage() {
 
       setStatus("success");
       setMessage(
-      code
-        ? `Reservation submitted! Confirmation code: ${code}. The owner will call/text to confirm about 1 day in advance.`
-        : "Reservation submitted! The owner will call/text to confirm about 1 day in advance."
-    );
-    //could make it 
+        code
+          ? `Quote request submitted! Confirmation code: ${code}. The owner will call/text to confirm and give a quote in person about 1 day in advance.`
+          : "Quote request submitted! The owner will call/text to confirm and give a quote in person about 1 day in advance."
+      );
     } catch (err: any) {
       setStatus("error");
       setMessage(err?.message ?? "Something went wrong.");
@@ -135,17 +139,29 @@ export default function BookingPage() {
 
             <nav className="w-full sm:w-auto px-4 py-3">
               <div className="flex flex-wrap justify-center gap-2 text-xs">
-                <Link href="/" className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition">
+                <Link
+                  href="/"
+                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                >
                   Home
                 </Link>
-                <Link href="/#services" className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition">
+                <Link
+                  href="/#services"
+                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                >
                   Services
                 </Link>
-                <Link href="/booking" className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition">
-                  Booking
+                <Link
+                  href="/booking"
+                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                >
+                  Request a Quote
                 </Link>
-                <Link href="/#contact" className="rounded-full border-2 border-black text-black/70 px-3 py-1 hover:bg-black hover:text-white transition">
-                  Contact
+                <Link
+                  href="/#contact"
+                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                >
+                  About
                 </Link>
               </div>
             </nav>
@@ -177,18 +193,22 @@ export default function BookingPage() {
                   <div className="text-sm text-black/70 font-medium">{selected.name}</div>
                   <div className="mt-1 text-xs text-black/60">{selected.description}</div>
                   <div className="mt-3 text-sm text-black/70 font-semibold">
-                    Price: ${selected.price.toFixed(2)}
+                    Estimated range: ${selected.minPrice.toFixed(0)} – ${selected.maxPrice.toFixed(0)}
+                  </div>
+
+                  <div className="mt-2 text-xs text-black/60">
+                    Final price is confirmed after a walkthrough and may vary case-by-case.
                   </div>
                 </div>
               </div>
 
               {/* Date/Time */}
               <div className="rounded-2xl border-2 border-black p-6">
-                <div className="text-sm text-black/70 font-medium">Date/Time Request</div>
+                <div className="text-sm text-black/70 font-medium">Date/Time For A Quote Request</div>
 
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs text-black/60">Requested date</label>
+                    <label className="block text-xs text-black/60">Preferred Date</label>
                     <input
                       type="date"
                       value={form.requestedDate}
@@ -198,12 +218,11 @@ export default function BookingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-black/60">Time window</label>
+                    <label className="block text-xs text-black/60">Preferred Time Window</label>
                     <input
-                      type="text"
-                      placeholder="e.g., 9am–12pm"
                       value={form.timeWindow}
                       onChange={(e) => update("timeWindow", e.target.value)}
+                      placeholder="e.g. 9am–12pm, after 5pm, etc."
                       className="mt-1 w-full rounded-lg border-2 border-black px-3 py-3 text-sm text-black/70"
                     />
                   </div>
@@ -213,106 +232,106 @@ export default function BookingPage() {
               {/* Notes */}
               <div className="rounded-2xl border-2 border-black p-6">
                 <div className="text-sm text-black/70 font-medium">Notes</div>
-                <label className="mt-3 block text-xs text-black/60">
+                <label className="mt-4 block text-xs text-black/60">
                   Pets, special requests, entry instructions, etc.
                 </label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => update("notes", e.target.value)}
+                  maxLength={1000}
                   rows={5}
                   className="mt-1 w-full rounded-lg border-2 border-black px-3 py-3 text-sm text-black/70"
                 />
               </div>
             </div>
 
-            {/* Right column */}
+            {/* Right column (user info) */}
             <div className="rounded-2xl border-2 border-black p-6">
               <div className="text-center text-sm text-black/70 font-medium">Enter Personal Info</div>
 
-              {/* 
-              Honeypot (hidden from ppl)
-              if bots try and fill this, their request is treated as spam and ignored lol get wreked
-              */}
-              <input
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-                value={form.website}
-                onChange={(e) => update("website", e.target.value)}
-                className="hidden"
-              />
-
-              <div className="mt-5 space-y-3">
+              <div className="mt-4 space-y-4">
                 <div>
-                  <label className="block text-xs text-black/60">Full name *</label>
+                  <label className="block text-xs text-black/60">Full Name</label>
                   <input
-                    type="text"
                     value={form.fullName}
                     onChange={(e) => update("fullName", e.target.value)}
+                    maxLength={80}
+                    minLength={2}
+                    autoComplete="name"
+                    placeholder="First Last"
                     className="mt-1 w-full rounded-lg border-2 border-black px-3 py-3 text-sm text-black/70"
-                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-black/60">Phone *</label>
+                  <label className="block text-xs text-black/60">Phone</label>
                   <input
-                    type="tel"
                     value={form.phone}
                     onChange={(e) => update("phone", e.target.value)}
+                    inputMode="tel"
+                    autoComplete="tel"
+                    maxLength={20}
+                    placeholder="(555) 555-5555"
                     className="mt-1 w-full rounded-lg border-2 border-black px-3 py-3 text-sm text-black/70"
-                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-black/60">Email *</label>
+                  <label className="block text-xs text-black/60">Email</label>
                   <input
                     type="email"
                     value={form.email}
                     onChange={(e) => update("email", e.target.value)}
+                    maxLength={254}
+                    autoComplete="email"
                     className="mt-1 w-full rounded-lg border-2 border-black px-3 py-3 text-sm text-black/70"
-                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-black/60">Address *</label>
+                  <label className="block text-xs text-black/60">Address</label>
                   <input
-                    type="text"
                     value={form.address}
                     onChange={(e) => update("address", e.target.value)}
+                    maxLength={200}
+                    autoComplete="street-address"
                     className="mt-1 w-full rounded-lg border-2 border-black px-3 py-3 text-sm text-black/70"
-                    required
                   />
                 </div>
+
+                {/* honeypot */}
+                <input
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={form.website}
+                  onChange={(e) => update("website", e.target.value)}
+                  className="hidden"
+                />
 
                 <button
                   type="submit"
                   disabled={status === "submitting"}
-                  className="mt-2 w-full rounded-xl border-2 border-black bg-white px-4 py-3 text-sm text-black/70 font-semibold hover:bg-black hover:text-white transition disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-black/70"
+                  className="mt-2 w-full rounded-xl border-2 border-black bg-white px-4 py-3 text-sm font-semibold text-black/70 hover:bg-black hover:text-white disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-black/70 transition"
                 >
-                  {status === "submitting" ? "Submitting..." : "Submit Reservation"}
+                  {status === "submitting" ? "Submitting..." : "Submit Quote Request"}
                 </button>
 
-                {message ? (
-                  <div
-                    className={`pt-3 text-center text-xs ${
-                      status === "error" ? "text-red-600" : "text-black/70"
-                    }`}
-                  >
-                    {message}
-                    {status === "success" && message.includes("Confirmation code:") ? (
-                      <div className="mt-2 inline-block rounded-lg border-2 border-black px-3 py-2 text-sm font-semibold text-black/80">
-                        {message.split("Confirmation code: ")[1]?.split(".")[0]}
-                      </div>
-                    ) : null}
-                  </div>
-                ) : (
-                  <p className="pt-2 text-center text-xs text-black/60">
-                    You will receive a call/text to confirm about 1 day in advance.
-                  </p>
-                )}
+                <div className="min-h-[60px] pt-3 text-center text-xs">
+                  {status === "success" ? (
+                    <div className="rounded-lg border-2 border-black bg-white px-3 py-3 text-black/70">
+                      {message}
+                    </div>
+                  ) : status === "error" ? (
+                    <div className="rounded-lg border-2 border-red-600 bg-white px-3 py-3 text-red-600">
+                      {message}
+                    </div>
+                  ) : (
+                    <p className="pt-2 text-center text-xs text-black/60">
+                      You will receive a call/text to confirm and obtain a quote for your service from the owner.
+                      They will need to see the area they are cleaning in advance before the scheduled cleaning date.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </form>

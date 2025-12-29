@@ -1,10 +1,16 @@
 import LoginForm from "./LoginForm";
 
-export default function OwnerLoginPage({
+function first(v: string | string[] | undefined) {
+  return Array.isArray(v) ? v[0] : v;
+}
+
+export default async function OwnerLoginPage({
   searchParams,
 }: {
-  searchParams?: { next?: string };
+  searchParams?: Promise<{ next?: string | string[] }>;
 }) {
-  const next = searchParams?.next ?? "/owner";
+  const sp = (await searchParams) ?? {};
+  const next = first(sp.next) ?? "/owner";
+
   return <LoginForm next={next} />;
 }
