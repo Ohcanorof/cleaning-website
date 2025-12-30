@@ -150,9 +150,9 @@ export default async function OwnerPage({
   const hasMore = view === "list" && reservations.length === PAGE_SIZE;
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <section className="rounded-2xl border-2 border-black p-6 sm:p-8">
+        <section className="rounded-2xl border border-transparent bg-card p-6 sm:p-8 shadow-sm">
           <OwnerHeaderActions />
 
           {/* OwnerFilters takes NO props in your project */}
@@ -172,8 +172,8 @@ export default async function OwnerPage({
                   const items = reservations.filter((r) => r.requested_date === dayYMD);
 
                   return (
-                    <div key={dayYMD} className="rounded-xl border-2 border-black">
-                      <div className="border-b-2 border-black px-4 py-3 text-sm font-semibold text-black/80">
+                    <div key={dayYMD} className="rounded-xl border border-transparent bg-card-muted shadow-sm">
+                      <div className="border-b border-black/10 px-4 py-3 text-sm font-semibold text-foreground/80">
                         {day.toLocaleDateString(undefined, {
                           weekday: "long",
                           month: "short",
@@ -188,7 +188,7 @@ export default async function OwnerPage({
                           items.map((r) => (
                             <div
                               key={r.id}
-                              className="rounded-xl border-2 border-black px-4 py-3"
+                              className="rounded-xl border border-transparent bg-card shadow-sm px-4 py-3"
                             >
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="text-sm font-semibold text-black/80">
@@ -226,7 +226,7 @@ export default async function OwnerPage({
             <>
               <div className="mt-6 space-y-4">
                 {reservations.map((r) => (
-                  <div key={r.id} className="rounded-xl border-2 border-black p-5">
+                  <div key={r.id} className="rounded-xl border border-transparent bg-card-muted p-5 shadow-sm">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="text-sm font-semibold text-black/80">
                         {r.service_name} — Est. ${Number(r.service_min_price).toFixed(0)}–$

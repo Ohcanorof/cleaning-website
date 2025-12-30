@@ -97,8 +97,7 @@ export default function OwnerFilters() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Name, phone, email, address, code, service..."
-          className="mt-1 w-full rounded-lg border-2 border-black px-3 py-2 text-sm text-black/70"
-        />
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"        />
       </div>
 
       <div className="sm:w-72">
@@ -106,7 +105,7 @@ export default function OwnerFilters() {
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="mt-1 w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black/70"
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
         >
           {OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -149,14 +148,14 @@ export default function OwnerFilters() {
       <div className="flex gap-2">
         <button
           type="submit"
-          className="rounded-lg border-2 border-black px-4 py-2 text-sm font-semibold text-black/70 hover:bg-black hover:text-white transition"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:opacity-90 transition shadow-sm"
         >
           Apply
         </button>
         <button
           type="button"
           onClick={clear}
-          className="rounded-lg border-2 border-black px-4 py-2 text-sm font-semibold text-black/70 hover:bg-black hover:text-white transition"
+          className="rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground/80 ring-1 ring-black/10 hover:bg-card-muted transition"
         >
           Clear
         </button>

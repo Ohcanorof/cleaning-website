@@ -2,43 +2,43 @@ import Link from "next/link";
 
 export default function HomePage(){
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-[color:var(--background)]">
       <div className="mx-auto max-w-6xl px-6 py-10">
         <section className="rounded-2xl border-2 border-transparent p-2 sm:p-6">
           {/* Header (keep as its own block; NOT inside a grid) */}
           <header className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="w-full sm:w-auto rounded-xl border-2 border-black px-6 py-4 text-center">
+            <div className="w-full sm:w-auto rounded-xl border-2 border-transparent bg-[color:var(--card)] px-6 py-4 text-center shadow-sm">
               <div className="text-sm text-black/70 font-medium">
-                Cleaning Services
+                Patricia’s House Cleaning
               </div>
             </div>
 
-            <nav className="w-full sm:w-auto rounded-xl border-2 border-black px-4 py-3">
+            <nav className="w-full sm:w-auto rounded-xl border-2 border-transparent bg-[color:var(--card)] px-4 py-3 shadow-sm">
               <div className="flex flex-wrap justify-center gap-2 text-xs">
                 <Link
                   href="/"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Home
                 </Link>
 
                 <Link
                   href="/#services"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Services
                 </Link>
 
                 <Link
                   href="/booking"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Request a Quote
                 </Link>
 
                 <Link
                   href="/#about"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   About
                 </Link>
@@ -47,21 +47,33 @@ export default function HomePage(){
           </header>
 
           {/* Hero + Services */}
-          <section className="mt-10 rounded-2xl border-2 border-black px-6 py-10">
-            <div className="text-center text-xs font-semibold tracking-wide text-black/70">
-              Welcome
+          <section className="mt-10 overflow-hidden rounded-2xl border-2 border-transparent bg-[color:var(--card)] shadow-sm">
+            {/* Hero text block with dimmed background image */}
+            <div className="relative">
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: "url('/clean1.png')" }}
+              />
+              <div className="absolute inset-0 bg-black/45" />
+
+              <div className="relative px-6 py-12 text-center sm:px-10 sm:py-16">
+                <div className="text-center text-[11px] font-semibold tracking-[0.22em] text-white/85 uppercase">
+                  Welcome
+                </div>
+
+                <div className="font-display mt-4 text-center text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                  Patricia’s House Cleaning
+                </div>
+
+                <div className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-white/90 sm:text-base">
+                  Pricing is advertised as an estimated range. Final pricing is confirmed after an in-person quote.
+                </div>
+              </div>
             </div>
 
-            <div className="mt-3 text-center text-3xl font-semibold tracking-tight text-black/80">
-              Patricia’s House Cleaning
-            </div>
-
-            <div className="mt-4 text-center text-sm text-black/60">
-              Pricing is advertised as an estimated range. Final pricing is confirmed after an in-person quote.
-            </div>
-
-            <div id="services" className="mt-8 grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border-2 border-black px-6 py-8">
+            <div id="services" className="px-6 py-10">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div className="rounded-2xl border-2 border-transparent bg-[color:var(--card-muted)] px-6 py-8 shadow-sm">
                 <div className="text-sm text-black/70 font-medium">
                   Services
                 </div>
@@ -74,7 +86,7 @@ export default function HomePage(){
                   ].map((s) => (
                     <div
                       key={s.title}
-                      className="rounded-xl border-2 border-black px-5 py-4"
+                      className="rounded-xl border-2 border-transparent bg-white/70 px-5 py-4 shadow-sm"
                     >
                       <div className="text-sm text-black/70 font-medium">
                         {s.title}
@@ -86,7 +98,7 @@ export default function HomePage(){
                   <div className="pt-2">
                     <Link
                       href="/booking"
-                      className="inline-block rounded-xl border-2 border-black bg-white px-4 py-3 text-sm text-black/70 font-semibold hover:bg-black hover:text-white transition"
+                      className="inline-block rounded-xl border-2 border-transparent bg-[color:var(--accent)] px-4 py-3 text-sm font-semibold text-[color:var(--accent-foreground)] shadow-sm hover:bg-emerald-800 transition"
                     >
                       Request a Quote →
                     </Link>
@@ -94,7 +106,7 @@ export default function HomePage(){
                 </div>
               </div>
 
-              <div className="rounded-2xl border-2 border-black px-6 py-8">
+              <div className="rounded-2xl border-2 border-transparent bg-[color:var(--card-muted)] px-6 py-8 shadow-sm">
                 <div className="text-sm text-black/70 font-medium">How it works</div>
 
                 <div className="mt-4 space-y-3 text-sm text-black/60">
@@ -103,15 +115,16 @@ export default function HomePage(){
                   <div>3) After the walkthrough, we confirm the final price and schedule the cleaning.</div>
                 </div>
               </div>
+              </div>
             </div>
           </section>
 
           {/* About / links */}
           <section
             id="about"
-            className="mt-10 rounded-2xl border-2 border-black px-6 py-10 text-center"
+            className="mt-10 rounded-2xl border-2 border-transparent bg-[color:var(--card)] px-6 py-10 text-center shadow-sm"
           >
-            <div className="text-m text-black/70 font-medium">About</div>
+            <div className="font-display text-2xl font-semibold text-black/80">About</div>
 
             <div className="text-sm text-black/70 font-medium">
               A cleaning service based in _. Our pricing is advertised as an estimated range, and the final price is provided after an in-person quote.
@@ -120,7 +133,7 @@ export default function HomePage(){
             <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
               <Link
                 href="https://www.instagram.com/patriciashousecleaningservice/"
-                className="rounded-full border-2 border-black bg-white text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
+                className="rounded-full border border-black/10 bg-white/70 text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
                 target="_blank"
               >
                 Instagram
@@ -128,7 +141,7 @@ export default function HomePage(){
 
               <Link
                 href="/#contact"
-                className="rounded-full border-2 border-black bg-white text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
+                className="rounded-full border border-black/10 bg-white/70 text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
               >
                 Contact
               </Link>

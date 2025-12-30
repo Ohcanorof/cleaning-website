@@ -12,5 +12,13 @@ export default async function OwnerLoginPage({
   const sp = (await searchParams) ?? {};
   const next = first(sp.next) ?? "/owner";
 
-  return <LoginForm next={next} />;
+  return (
+   <main className="min-h-screen bg-background text-foreground">
+     <div className="mx-auto max-w-lg px-6 py-10">
+      <div className="rounded-2xl bg-card shadow-sm border border-transparent p-6">
+         <LoginForm next={next} />
+       </div>
+     </div>
+   </main>
+ );
 }

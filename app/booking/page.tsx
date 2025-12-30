@@ -128,38 +128,38 @@ export default function BookingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-[color:var(--background)]">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <section className="rounded-2xl border-2 border-black p-6 sm:p-8">
+        <section className="rounded-2xl border-2 border-transparent bg-[color:var(--card)] p-6 shadow-sm sm:p-8">
           {/* Header */}
           <header className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="w-full sm:w-auto rounded-xl border-2 border-black px-6 py-4 text-center">
-              <div className="text-sm text-black/70 font-medium">Cleaning Services</div>
+            <div className="w-full sm:w-auto rounded-xl border-2 border-transparent bg-[color:var(--card-muted)] px-6 py-4 text-center shadow-sm">
+              <div className="text-sm text-black/70 font-medium">Patricia's House Cleaning</div>
             </div>
 
-            <nav className="w-full sm:w-auto px-4 py-3">
+            <nav className="w-full sm:w-auto rounded-xl border-2 border-transparent bg-[color:var(--card-muted)] px-4 py-3 shadow-sm">
               <div className="flex flex-wrap justify-center gap-2 text-xs">
                 <Link
                   href="/"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Home
                 </Link>
                 <Link
                   href="/#services"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Services
                 </Link>
                 <Link
                   href="/booking"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Request a Quote
                 </Link>
                 <Link
                   href="/#contact"
-                  className="rounded-full border-2 border-black bg-white text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
+                  className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   About
                 </Link>
@@ -172,7 +172,7 @@ export default function BookingPage() {
             {/* Left column */}
             <div className="space-y-6">
               {/* Select service */}
-              <div className="rounded-2xl border-2 border-black p-6">
+              <div className="rounded-2xl border-2 border-transparent bg-[color:var(--card-muted)] p-6 shadow-sm">
                 <div className="text-sm text-black/70 font-medium">Select Services</div>
 
                 <label className="mt-4 block text-xs text-black/60">Service</label>
@@ -188,7 +188,7 @@ export default function BookingPage() {
                   ))}
                 </select>
 
-                <div className="mt-4 rounded-lg border-2 border-black px-4 py-3">
+                <div className="mt-4 rounded-lg border-2 border-transparent bg-white/70 px-4 py-3 shadow-sm">
                   <div className="text-xs text-black/60">Selected:</div>
                   <div className="text-sm text-black/70 font-medium">{selected.name}</div>
                   <div className="mt-1 text-xs text-black/60">{selected.description}</div>
@@ -203,7 +203,7 @@ export default function BookingPage() {
               </div>
 
               {/* Date/Time */}
-              <div className="rounded-2xl border-2 border-black p-6">
+              <div className="rounded-2xl border-2 border-transparent bg-[color:var(--card-muted)] p-6 shadow-sm">
                 <div className="text-sm text-black/70 font-medium">Date/Time For A Quote Request</div>
 
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -230,7 +230,7 @@ export default function BookingPage() {
               </div>
 
               {/* Notes */}
-              <div className="rounded-2xl border-2 border-black p-6">
+              <div className="rounded-2xl border-2 border-transparent bg-[color:var(--card-muted)] p-6 shadow-sm">
                 <div className="text-sm text-black/70 font-medium">Notes</div>
                 <label className="mt-4 block text-xs text-black/60">
                   Pets, special requests, entry instructions, etc.
@@ -246,7 +246,7 @@ export default function BookingPage() {
             </div>
 
             {/* Right column (user info) */}
-            <div className="rounded-2xl border-2 border-black p-6">
+              <div className="rounded-2xl border-2 border-transparent bg-[color:var(--card-muted)] p-6 shadow-sm">
               <div className="text-center text-sm text-black/70 font-medium">Enter Personal Info</div>
 
               <div className="mt-4 space-y-4">
@@ -311,14 +311,14 @@ export default function BookingPage() {
                 <button
                   type="submit"
                   disabled={status === "submitting"}
-                  className="mt-2 w-full rounded-xl border-2 border-black bg-white px-4 py-3 text-sm font-semibold text-black/70 hover:bg-black hover:text-white disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-black/70 transition"
+                  className="mt-2 w-full rounded-xl border-2 border-transparent bg-[color:var(--accent)] px-4 py-3 text-sm font-semibold text-[color:var(--accent-foreground)] shadow-sm hover:bg-emerald-800 disabled:opacity-50 disabled:hover:bg-[color:var(--accent)] transition"
                 >
                   {status === "submitting" ? "Submitting..." : "Submit Quote Request"}
                 </button>
 
                 <div className="min-h-[60px] pt-3 text-center text-xs">
                   {status === "success" ? (
-                    <div className="rounded-lg border-2 border-black bg-white px-3 py-3 text-black/70">
+                    <div className="rounded-lg border-2 border-transparent bg-white/70 px-3 py-3 text-black/70 shadow-sm">
                       {message}
                     </div>
                   ) : status === "error" ? (
