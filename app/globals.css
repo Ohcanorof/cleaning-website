@@ -2,11 +2,20 @@
 
 :root {
   /* Warm minimal palette */
-  --background: #fbf7f2;
+ /* --background: #fbf7f2;
   --foreground: #161616;
 
   --card: #fffdf8;
   --card-muted: #f6efe6;
+  --accent: #1f6f63;
+  --accent-foreground: #ffffff;
+*/
+  --background: #f2f5f9;
+  --foreground: #0f172a;
+
+  --card: #ffffff;
+  --card-muted: #e8eef6;
+
   --accent: #1f6f63;
   --accent-foreground: #ffffff;
 }

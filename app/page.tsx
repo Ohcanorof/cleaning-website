@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage(){
   return (
@@ -66,7 +67,7 @@ export default function HomePage(){
                 </div>
 
                 <div className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-white/90 sm:text-base">
-                  Pricing is advertised as an estimated range. Final pricing is confirmed after an in-person quote.
+                  Pricing is advertised as an estimated range, prices may vary case by case. Final pricing is confirmed after an in-person quote.
                 </div>
               </div>
             </div>
@@ -122,35 +123,55 @@ export default function HomePage(){
           {/* About / links */}
           <section
             id="about"
-            className="mt-10 rounded-2xl border-2 border-transparent bg-[color:var(--card)] px-6 py-10 text-center shadow-sm"
+            className="mt-10 rounded-2xl border-2 border-transparent bg-[color:var(--card)] px-10 py-10 text-center shadow-sm"
           >
             <div className="font-display text-2xl font-semibold text-black/80">About</div>
 
-            <div className="text-sm text-black/70 font-medium">
-              A cleaning service based in _. Our pricing is advertised as an estimated range, and the final price is provided after an in-person quote.
+            <div className="mt-3 text-sm text-black/70 font-medium">
+              We are a small, family-owned cleaning business serving the Tri-Valley and 209 
+              areas. Our business is run by a hardworking mother and her daughters who are 
+              passionate about providing dependable, high-quality cleaning services to our community.
+              We understand how important it is to feel comfortable in your own home, which is why we treat every house with care, honesty, and attention to detail. whether
+              you need regular cleaning or a deep clean, we are committed to leaving your home fresh, organized, and stress free.
+
+              
             </div>
 
-            <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
-              <Link
-                href="https://www.instagram.com/patriciashousecleaningservice/"
-                className="rounded-full border border-black/10 bg-white/70 text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
-                target="_blank"
-              >
-                Instagram
-              </Link>
+            <div className="mt-3 flex justify-center">
+            <Link
+              href="https://www.instagram.com/patriciashousecleaningservice/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Patricia’s House Cleaning on Instagram"
+              title="Instagram"
+              className="inline-flex items-center justify-center rounded-full p-2 transition hover:bg-black/5"
+            >
+              <Image
+                src="/insta1.png"
+                alt="Instagram"
+                width={50}
+                height={50}
+                className="opacity-80 hover:opacity-100 transition"
+              />
+            </Link>
+          </div>
 
-              <Link
-                href="/#contact"
-                className="rounded-full border border-black/10 bg-white/70 text-black/70 px-4 py-2 hover:bg-black hover:text-white transition"
-              >
-                Contact
-              </Link>
+            <div id="contact" className="mt-4 text-xs text-black/60">
+              Available Monday - Friday | 9:00 AM - 5:00 PM   
+            </div>
+
+            <div id="contact" className="mt-6 text-xs text-black/60"> 
+              Contact Hours: 9:00 AM - 5:00 PM
             </div>
 
             <div id="contact" className="mt-6 text-xs text-black/60">
-              (phone number: 209-455-2946)
-              (email: pattyshousecleaning1579@gmail.com)
+              Phone Number: 209-455-2946
             </div>
+
+            <div id="contact" className="mt-6 text-xs text-black/60">
+              Email: pattyshousecleaning1579@gmail.com
+            </div>
+
           </section>
         </section>
       </div>
