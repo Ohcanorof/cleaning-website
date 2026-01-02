@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import PhotoCarousel from "./PhotoCarousel";
 
 export default function HomePage(){
   return (
@@ -119,6 +120,13 @@ export default function HomePage(){
               </div>
             </div>
           </section>
+
+          {/* phot galery/carousel */}
+          <div className="mx-auto max-w-6xl">
+            <div className="overflow-hidden rounded-2xl">
+              <PhotoCarousel />
+            </div>
+          </div>
 
           {/* About / links */}
           <section

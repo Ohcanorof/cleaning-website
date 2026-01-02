@@ -49,3 +49,78 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+body {
+  position: relative;
+}
+
+/*found the Embla carousel online and am using it (gallery)*/
+.embla {
+  width: 100%;
+  max-width: 100%;
+}
+
+.embla__viewport {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  contain: layout paint;
+  position: relative;
+}
+
+.embla__container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 2px;
+  touch-action: pan-y;
+
+  /* KEY: prevents container from forcing page width */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.embla__slide {
+  flex: 0 0 82%;
+  min-width: 0;
+  max-width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.embla__slide__inner {
+  transform: scale(0.92);
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.embla__slide.is-selected {
+  cursor: default;
+}
+
+.embla__slide.is-selected .embla__slide__inner {
+  transform: scale(1);
+}
+
+/* tablet */
+@media (min-width: 640px) {
+  .embla__slide {
+    flex-basis: 45%;
+  }
+}
+
+/* desktop: max 3 visible */
+@media (min-width: 1024px) {
+  .embla__slide {
+    flex-basis: 33.3333%;
+  }
+}
