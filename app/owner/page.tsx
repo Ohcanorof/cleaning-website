@@ -6,7 +6,7 @@ import OwnerFilters from "./OwnerFilters";
 import OwnerPagination from "./OwnerPagination";
 import WeekNav from "./WeekNav";
 
-// reservation row type
+//reservation row type
 type ReservationStatus = "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELED";
 type ReservationRow = {
   id: string;
@@ -52,7 +52,7 @@ export default async function OwnerPage({
   const supabase = await createClient();
   const sp = (await searchParams) ?? {};
 
-  // Auth gate
+  //Auth gate
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -60,7 +60,7 @@ export default async function OwnerPage({
   const userId = user?.id;
   if (!userId) redirect("/owner/login?next=/owner");
 
-  // Admin gate
+  //admin gate
   const { data: adminRow } = await supabase
     .from("admins")
     .select("user_id")
@@ -68,13 +68,13 @@ export default async function OwnerPage({
     .maybeSingle();
 
   if (!adminRow) redirect("/owner/login?next=/owner");
-  // --- filters (normalized) ---
+  //normalized filters
   const view = first(sp.view) === "calendar" ? "calendar" : "list";
   const q = (first(sp.q) ?? "").toString().trim();
   const sort = (first(sp.sort) ?? "created_desc").toString();
   const page = Math.max(1, Number(first(sp.page) ?? "1"));
 
-  // status param comes from OwnerFilters: "active", "new", "confirmed", "completed", "canceled", "all"
+  //status param comes from OwnerFilters: "active", "new", "confirmed", "completed", "canceled", "all"
   const statusParam = (first(sp.status) ?? "active").toLowerCase();
 
   const statusToList: Record<string, ReservationStatus[]> = {
@@ -88,7 +88,7 @@ export default async function OwnerPage({
 
   const statuses = statusToList[statusParam] ?? statusToList.active;
 
-  // Sort config (list view)
+  //sort config (list view)
   const sortConfig =
     sort === "created_asc"
       ? { col: "created_at", asc: true }
@@ -100,7 +100,7 @@ export default async function OwnerPage({
 
   const PAGE_SIZE = 20;
 
-  // Base query
+  //the base query
   let query = supabase
     .from("reservations")
     .select(
@@ -121,7 +121,7 @@ export default async function OwnerPage({
     );
   }
 
-  // Calendar week range
+  //calendar week range
   const weekParam = first(sp.week) ?? toYMD(new Date());
   const weekStartDate = mondayOf(weekParam);
   const weekStart = toYMD(weekStartDate);
@@ -152,15 +152,15 @@ export default async function OwnerPage({
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <section className="rounded-2xl border border-transparent bg-card p-6 sm:p-8 shadow-sm">
+        <section className="rounded-2xl border-2 border-transparent p-2 sm:p-6">
           <OwnerHeaderActions />
 
-          {/* OwnerFilters takes NO props in your project */}
+          {/*no props for the OwnerFilters*/}
           <OwnerFilters />
 
           {view === "calendar" ? (
             <>
-              {/* WeekNav expects weekStart */}
+              {/*WeekNav expects weekStart here*/}
               <WeekNav weekStart={weekStart} />
 
               <div className="mt-6 space-y-3">
@@ -217,7 +217,7 @@ export default async function OwnerPage({
               </div>
 
               {reservations.length === 0 ? (
-                <div className="mt-6 rounded-xl border-2 border-black p-4 text-sm text-black/60">
+                <div className="mt-6 rounded-xl border-2 border-transparent bg-card-muted p-4 text-sm text-black/60 shadow-sm">
                   No quote requests this week.
                 </div>
               ) : null}

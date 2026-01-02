@@ -16,7 +16,10 @@ export default function LoginForm({ next }: { next: string }) {
     setErr(null);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
       setErr(error.message);
@@ -24,44 +27,55 @@ export default function LoginForm({ next }: { next: string }) {
     }
 
     router.replace(next);
-    router.refresh(); // helps server components re-check auth immediately
+    router.refresh();
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
-      <form onSubmit={onLogin} className="w-full max-w-md space-y-4 rounded-2xl border p-6">
-        <h1 className="text-2xl font-semibold">Owner Login</h1>
+    <form onSubmit={onLogin} className="space-y-4">
+      <div className="text-center">
+        <div className="text-xs font-semibold tracking-wide text-black/70">
+          owner portal
+        </div>
+        <h1 className="mt-2 text-3xl font-semibold font-display text-black/80">
+          Sign in
+        </h1>
+        <p className="mt-2 text-sm text-black/60">
+          Use your owner credentials to access the dashboard.
+        </p>
+      </div>
 
-        <label className="block">
-          <span className="text-sm">Email</span>
-          <input
-            className="mt-1 w-full rounded-lg border p-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            autoComplete="email"
-            required
-          />
-        </label>
+      <label className="block">
+        <span className="text-xs text-black/60">Email</span>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          autoComplete="email"
+          required
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
+        />
+      </label>
 
-        <label className="block">
-          <span className="text-sm">Password</span>
-          <input
-            className="mt-1 w-full rounded-lg border p-2"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            autoComplete="current-password"
-            required
-          />
-        </label>
+      <label className="block">
+        <span className="text-xs text-black/60">Password</span>
+        <input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          autoComplete="current-password"
+          required
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
+        />
+      </label>
 
-        {err && <p className="text-sm text-red-600">{err}</p>}
+      {err && <p className="text-sm text-red-600">{err}</p>}
 
-        <button className="w-full rounded-lg border px-4 py-2 font-medium">
-          Log in
-        </button>
-      </form>
-    </main>
+      <button
+        type="submit"
+        className="w-full rounded-xl border-2 border-transparent bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm hover:opacity-90 transition"
+      >
+        Log in
+      </button>
+    </form>
   );
 }

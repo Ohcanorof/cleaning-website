@@ -1,8 +1,11 @@
+
+
 import type { Metadata } from "next";
 import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import CustomerPageTransition from "./CustomerPageTransition";
 
-// Warm + minimal: clean sans for body, soft serif for headings.
+//csans for body, serif for headings.
 const bodyFont = Inter({
   variable: "--font-body",
   subsets: ["latin"],
@@ -33,7 +36,7 @@ export default function RootLayout({
       <body
         className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable} antialiased`}
       >
-        {children}
+        <CustomerPageTransition>{children}</CustomerPageTransition>
       </body>
     </html>
   );

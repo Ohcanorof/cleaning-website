@@ -23,7 +23,7 @@ export default function WeekNav({ weekStart }: { weekStart: string }) {
       <button
         type="button"
         onClick={() => shift(-7)}
-        className="rounded-lg border-2 border-black px-3 py-2 text-xs font-semibold text-black/70 hover:bg-black hover:text-white transition"
+        className="rounded-xl border-2 border-transparent bg-card px-3 py-2 text-xs font-semibold text-black/70 shadow-sm hover:bg-card-muted transition"
       >
         ← Prev week
       </button>
@@ -33,7 +33,7 @@ export default function WeekNav({ weekStart }: { weekStart: string }) {
       <button
         type="button"
         onClick={() => shift(7)}
-        className="rounded-lg border-2 border-black px-3 py-2 text-xs font-semibold text-black/70 hover:bg-black hover:text-white transition"
+        className="rounded-xl border-2 border-transparent bg-card px-3 py-2 text-xs font-semibold text-black/70 shadow-sm hover:bg-card-muted transition"
       >
         Next week →
       </button>

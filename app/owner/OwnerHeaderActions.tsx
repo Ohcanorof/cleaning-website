@@ -18,7 +18,7 @@ export default function OwnerHeaderActions(){
 
     //logout button
     return( <button onClick={logout} disabled={loading} 
-        className="rounded-lg border-2 border-black px-4 py-2 text-xs font-semibold text-black/70 hover:bg-black hover:text-white transition disabled:opacity-50"> 
+        className="rounded-xl border-2 border-transparent bg-card px-4 py-2 text-sm font-semibold text-black/70 shadow-sm hover:bg-card-muted transition disabled:opacity-50"> 
         {loading ? "Signing out..." : "Log out"} </button>);
 
 }

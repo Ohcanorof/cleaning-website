@@ -6,8 +6,9 @@
 }
   */
 
-import { Resend } from "resend";
+import { Resend} from "resend";
 import { createClient } from "@/lib/supabase/server";
+import { reservationRatelimit } from "@/lib/ratelimit";
 
 type ReservationPayload = {
   //reservation info
@@ -28,6 +29,14 @@ type ReservationPayload = {
   website?: string; //honeypot for da bots
 };
 
+
+function getClientIp(req: Request) {
+  // Vercel/Proxies commonly set x-forwarded-for
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") ?? "unknown";
+}
+
 //email route four reservations
 export async function POST(req: Request) {
   try {
@@ -35,6 +44,23 @@ export async function POST(req: Request) {
 
     //honeypot
     if (body.website) return Response.json({ ok: true });
+
+    const ip = getClientIp(req);
+    const { success, limit, remaining, reset } = await reservationRatelimit.limit(
+      `reservation:${ip}`
+    );
+
+    if (!success) {
+      return Response.json(
+        {
+          error: "Too many requests. Please wait a bit and try again.",
+          limit,
+          remaining,
+          reset,
+        },
+        { status: 429 }
+      );
+    }
 
     //required fields
     if (

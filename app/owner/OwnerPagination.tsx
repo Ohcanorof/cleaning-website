@@ -26,7 +26,7 @@ export default function OwnerPagination({
       <button
         type="button"
         onClick={loadMore}
-        className="rounded-lg border-2 border-black px-5 py-2 text-sm font-semibold text-black/70 hover:bg-black hover:text-white transition"
+        className="rounded-xl border-2 border-transparent bg-card px-5 py-2 text-sm font-semibold text-black/70 shadow-sm hover:bg-card-muted transition"
       >
         Load more
       </button>

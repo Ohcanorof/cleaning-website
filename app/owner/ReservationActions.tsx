@@ -44,7 +44,7 @@ export default function ReservationActions({
 
   async function onComplete() {
     const raw = window.prompt("Enter the final price charged (example: 220.00)");
-    if (raw === null) return; // canceled
+    if (raw === null) return; //canceled
 
     const n = Number(raw);
     if (!Number.isFinite(n) || n < 0) {
@@ -56,7 +56,15 @@ export default function ReservationActions({
   }
 
   const baseBtn =
-    "rounded-lg border-2 border-black px-3 py-2 text-xs font-semibold text-black/70 hover:bg-black hover:text-white transition disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-black/70";
+    "rounded-xl px-3 py-2 text-xs font-semibold transition shadow-sm disabled:opacity-50";
+
+  const primaryBtn =
+    baseBtn +
+    " bg-accent text-accent-foreground hover:opacity-90";
+
+  const secondaryBtn =
+    baseBtn +
+    " bg-card text-foreground/80 ring-1 ring-black/10 hover:bg-card-muted";
 
   const canConfirm = currentStatus === "NEW";
   const canComplete = currentStatus === "CONFIRMED";
@@ -67,7 +75,7 @@ export default function ReservationActions({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          className={baseBtn}
+          className={primaryBtn}
           disabled={loading !== null || !canConfirm}
           onClick={() => setStatus("CONFIRMED")}
           title={!canConfirm ? "Only NEW requests can be confirmed." : undefined}
@@ -77,7 +85,7 @@ export default function ReservationActions({
 
         <button
           type="button"
-          className={baseBtn}
+          className={primaryBtn}
           disabled={loading !== null || !canComplete}
           onClick={onComplete}
           title={!canComplete ? "Only CONFIRMED requests can be completed." : undefined}
@@ -87,7 +95,7 @@ export default function ReservationActions({
 
         <button
           type="button"
-          className={baseBtn}
+          className={secondaryBtn}
           disabled={loading !== null || !canCancel}
           onClick={() => setStatus("CANCELED")}
           title={!canCancel ? "Only NEW/CONFIRMED requests can be canceled." : undefined}

@@ -13,7 +13,7 @@ const OPTIONS = [
   { value: "all", label: "All" },
 ];
 
-//Sort options
+//sort options
 const SORT_OPTIONS = [
   {value: "created_desc", label: "Created (newest)"},
   {value: "created_asc", label: "Created (oldest)"},
@@ -55,11 +55,11 @@ export default function OwnerFilters() {
     //reseting the pagination when the time filters change
     p.delete("page");
 
-    // status
+    //status
     if (!nextStatus || nextStatus === "active") p.delete("status");
     else p.set("status", nextStatus);
 
-    // search
+    //search
     const trimmed = nextQ.trim();
     if (!trimmed) p.delete("q");
     else p.set("q", trimmed);
@@ -120,7 +120,7 @@ export default function OwnerFilters() {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="mt-1 w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black/70"
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
         >
           {SORT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -135,7 +135,7 @@ export default function OwnerFilters() {
         <select
           value={view}
           onChange={(e) => setView(e.target.value)}
-          className="mt-1 w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black/70"
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
         >
           {VIEW_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>

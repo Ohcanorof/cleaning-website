@@ -23,12 +23,12 @@ export default function HomePage(){
                   Home
                 </Link>
 
-                <Link
+                <a
                   href="/#services"
                   className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Services
-                </Link>
+                </a>
 
                 <Link
                   href="/booking"
@@ -37,12 +37,12 @@ export default function HomePage(){
                   Request a Quote
                 </Link>
 
-                <Link
+                <a
                   href="/#about"
                   className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   About
-                </Link>
+                </a>
               </div>
             </nav>
           </header>
