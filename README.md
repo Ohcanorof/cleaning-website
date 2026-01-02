@@ -1,6 +1,6 @@
-# Cleaning Company Booking Site + Owner Dashboard (Next.js) — Work In Progress
+# Cleaning Company Quote Request Site + Owner Dashboard (Next.js)
 
-A reservation/booking website for a cleaning business. Customers submit a reservation request, the owner gets an email notification, and a secure owner-only dashboard (in progress) will show all active reservations and basic analytics.
+A quote-request website for a cleaning business. Customers submit a quote request (with an **estimated price range**), both the owner and customer receive confirmation emails, and the owner manages requests from a secure dashboard (confirm / complete / cancel). Final pricing is recorded after the job is completed and paid.
 
 ---
 
@@ -8,20 +8,32 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
 - **Next.js** (App Router)
 - **TypeScript**
 - **Tailwind CSS**
-- **Supabase** (Database + Auth planned/used for owner access)
-- **JSON** (used for data interchange/config where applicable)
+- **Supabase** (Database + Auth + RLS)
+- **Resend** (Email delivery)
+- **Upstash Redis** (Rate limiting)
 
 ---
 
 ## What this project does
-### Customer
-1. Customer fills out a reservation form
-2. The system sends an email notification to the owner (Gmail)
-3. (In progress) Reservation is stored in Supabase and becomes viewable in the owner dashboard
 
-### Owner (in progress)
-- Owner logs in to a protected route (ex: `/owner`)
-- Owner can view active reservations and manage statuses
+### Customer
+1. Customer selects a service and sees an **estimated price range** (min–max)
+2. Customer submits contact info + preferred quote date/time window + optional notes
+3. Request is stored in Supabase
+4. Emails are sent:
+   - Owner gets a notification email with the confirmation code + details
+   - Customer gets a receipt/confirmation email with the confirmation code
+
+### Owner
+- Owner logs in to protected routes (`/owner/*`) via Supabase Auth
+- Access is restricted via an `admins` whitelist table
+- Owner can:
+  - View requests in list view (filters/search/sort/pagination)
+  - View requests in weekly calendar view (by requested date)
+  - Manage status transitions:
+    - `NEW → CONFIRMED → COMPLETED` (requires final price)
+    - `NEW/CONFIRMED → CANCELED`
+  - Record the **final price charged** when completing a job
 
 ---
 
@@ -31,7 +43,7 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
 
 - Customer quote request page (`/booking`)
   - Service selection with **estimated price range** (min–max)
-  - Customer info fields (name/phone/email/address) + optional notes
+  - Customer fields (name/phone/email/address) + optional notes
   - Preferred quote date + time window
   - Honeypot field for basic bot reduction
   - **Server-side validation + normalization**
@@ -61,46 +73,47 @@ A reservation/booking website for a cleaning business. Customers submit a reserv
     - Search (name/phone/email/address/code/service)
     - Sorting (created date + requested date)
     - Pagination
-    - Displays **Final price charged** when a reservation is completed
+    - Displays **Final price charged** for completed jobs
   - Weekly calendar view (schedule-style view by requested date)
     - Always renders full week grid even when there are zero requests
   - Status management via API route:
     - Confirm / Complete (requires final price) / Cancel
-    - **Server-enforced status transitions** (NEW → CONFIRMED → COMPLETED, etc.)
+    - **Server-enforced status transitions**
   - Owner logout button
+
+- **Anti-spam (basic)**
+  - **Rate limiting** on quote submissions using **Upstash Redis**
+
+- UI/Theme polish
+  - Unified styling so customer pages and owner dashboard share the same theme
+  - Customer page transition fade
 
 ---
 
-### 🚧 Under Development
-
+### 🧠 Planned / Next Up
 - Dashboard UX polish
   - Improve labels/wording depending on filters/views
   - Cleaner layout/spacing refinements
   - Replace `prompt()` final price entry with a nicer modal/input UI
 
----
+- Owner onboarding / production readiness
+  - Add owner’s Supabase Auth user + whitelist UUID in `admins`
+  - Purchase + connect a custom domain (and set up DNS/email sender alignment)
 
-### 🧠 Planned / Next Up
+- Email deliverability improvements (after custom domain)
+  - Verify domain/sender in Resend for better inbox placement
+  - Owner email enhancements (direct dashboard link, cleaner formatting)
 
-- **Database constraints (hardening)**
+- Database constraints (hardening)
   - Add Postgres `CHECK` constraints for:
     - Allowed statuses
     - Price bounds + range validity
     - Length constraints for name/email/address/notes
   - (Optional) Move to an enum type for status
 
-- **Anti-spam / abuse protection**
-  - Rate limiting and/or CAPTCHA (Cloudflare Turnstile / hCaptcha)
-  - Optional: basic duplicate detection (same phone/email within X minutes)
-
-- Email deliverability improvements
-  - Verify domain/sender in Resend for better inbox placement
-  - Owner email enhancements (direct dashboard link, cleaner formatting)
-
-- Owner onboarding / production readiness
-  - Add owner’s Supabase Auth user + whitelist UUID in `admins`
-  - Purchase + connect a custom domain (and set up DNS/email sender alignment)
-
+- Anti-spam upgrades (optional)
+  - CAPTCHA (Cloudflare Turnstile / hCaptcha) after domain is registered
+  - Optional duplicate detection (same phone/email within X minutes)
 
 
 
