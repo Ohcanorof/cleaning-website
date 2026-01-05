@@ -50,7 +50,7 @@ export default function LoginForm({ next }: { next: string }) {
       // Send reset link to email. After clicking, Supabase will redirect to /auth/confirm,
       // which verifies the token and then routes to /owner/update-password.
       const { error } = await supabase.auth.resetPasswordForEmail(emailTrimmed, {
-        redirectTo: `${window.location.origin}/auth/confirm?next=/owner/update-password`,
+        redirectTo: "https://pattyshousecleaning.vercel.app/auth/confirm?next=/owner/update-password",
       });
 
       if (error) {
