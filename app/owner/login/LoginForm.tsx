@@ -8,17 +8,20 @@ export default function LoginForm({ next }: { next: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [sendingReset, setSendingReset] = useState(false);
 
   const router = useRouter();
 
   async function onLogin(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
+    setInfo(null);
 
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: email.trim(),
+      password: password.trim(),
     });
 
     if (error) {
@@ -28,6 +31,37 @@ export default function LoginForm({ next }: { next: string }) {
 
     router.replace(next);
     router.refresh();
+  }
+
+  async function onForgotPassword() {
+    setErr(null);
+    setInfo(null);
+
+    const emailTrimmed = email.trim();
+    if (!emailTrimmed) {
+      setErr("Enter your email first, then click “Forgot password”.");
+      return;
+    }
+
+    try {
+      setSendingReset(true);
+      const supabase = createClient();
+
+      // Send reset link to email. After clicking, Supabase will redirect to /auth/confirm,
+      // which verifies the token and then routes to /owner/update-password.
+      const { error } = await supabase.auth.resetPasswordForEmail(emailTrimmed, {
+        redirectTo: `${window.location.origin}/auth/confirm?next=/owner/update-password`,
+      });
+
+      if (error) {
+        setErr(error.message);
+        return;
+      }
+
+      setInfo("Password reset email sent. Check your inbox (and spam).");
+    } finally {
+      setSendingReset(false);
+    }
   }
 
   return (
@@ -69,12 +103,22 @@ export default function LoginForm({ next }: { next: string }) {
       </label>
 
       {err && <p className="text-sm text-red-600">{err}</p>}
+      {info && <p className="text-sm text-green-700">{info}</p>}
 
       <button
         type="submit"
         className="w-full rounded-xl border-2 border-transparent bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm hover:opacity-90 transition"
       >
         Log in
+      </button>
+
+      <button
+        type="button"
+        onClick={onForgotPassword}
+        disabled={sendingReset}
+        className="w-full rounded-xl border border-black/10 bg-card px-4 py-2 text-sm font-semibold text-black/70 shadow-sm hover:bg-card-muted transition disabled:opacity-50"
+      >
+        {sendingReset ? "Sending reset email..." : "Forgot password?"}
       </button>
     </form>
   );

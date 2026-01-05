@@ -1,10 +1,41 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import PhotoCarousel from "./PhotoCarousel";
 
-export default function HomePage(){
+function first(v: string | string[] | undefined) {
+  return Array.isArray(v) ? v[0] : v;
+}
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{
+    token_hash?: string | string[];
+    type?: string | string[];
+    code?: string | string[];
+    next?: string | string[];
+  }>;
+}) {
+  const sp = (await searchParams) ?? {};
+
+  // If Supabase sends an email link to the site root, forward it to /auth/confirm.
+  const token_hash = first(sp.token_hash);
+  const linkType = first(sp.type);
+  const code = first(sp.code);
+  const next = first(sp.next) ?? "/owner/update-password";
+
+  if (code || (token_hash && linkType)) {
+    const params = new URLSearchParams();
+    if (code) params.set("code", code);
+    if (token_hash) params.set("token_hash", token_hash);
+    if (linkType) params.set("type", linkType);
+    params.set("next", next);
+    redirect(`/auth/confirm?${params.toString()}`);
+  }
+
   return (
-    <main className="min-h-screen bg-[color:var(--background)]">
+<main className="min-h-screen bg-[color:var(--background)]">
       <div className="mx-auto max-w-6xl px-6 py-10">
         <section className="rounded-2xl border-2 border-transparent p-2 sm:p-6">
           {/* Header (keep as its own block; NOT inside a grid) */}
@@ -184,6 +215,6 @@ export default function HomePage(){
         </section>
       </div>
     </main>
-  );
-
+  
+);
 }

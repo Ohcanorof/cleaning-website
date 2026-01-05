@@ -32,6 +32,16 @@ function first(v: string | string[] | undefined) {
   return Array.isArray(v) ? v[0] : v;
 }
 
+/**
+ * Supabase `.or()` uses a filter-string. To avoid filter-string injection,
+ * keep search input to a safe subset and cap length.
+ */
+function sanitizeSearch(input: string) {
+  const trimmed = input.trim().slice(0, 60);
+  // Allow basic chars seen in names/emails/phones/addresses.
+  return trimmed.replace(/[^a-zA-Z0-9@.+\-\s]/g, "");
+}
+
 function toYMD(d: Date) {
   return d.toISOString().slice(0, 10);
 }
@@ -70,7 +80,7 @@ export default async function OwnerPage({
   if (!adminRow) redirect("/owner/login?next=/owner");
   //normalized filters
   const view = first(sp.view) === "calendar" ? "calendar" : "list";
-  const q = (first(sp.q) ?? "").toString().trim();
+  const q = sanitizeSearch((first(sp.q) ?? "").toString());
   const sort = (first(sp.sort) ?? "created_desc").toString();
   const page = Math.max(1, Number(first(sp.page) ?? "1"));
 

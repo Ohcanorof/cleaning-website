@@ -1,4 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
+import { ownerActionRatelimit } from "@/lib/ratelimit";
+import {
+  assertSameOrigin,
+  getClientIp,
+  jsonError,
+  rateLimitHeaders,
+  readJson,
+} from "@/lib/security";
+import { validateStrict, type Schema } from "@/lib/validation";
 
 type ReservationStatus = "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELED";
 
@@ -8,12 +17,11 @@ type Body = {
   finalPrice?: number; // required when status = COMPLETED
 };
 
-const allowedStatuses = new Set<ReservationStatus>([
-  "NEW",
-  "CONFIRMED",
-  "COMPLETED",
-  "CANCELED",
-]);
+const BodySchema: Schema<Body> = {
+  id: { type: "string", required: true, min: 1, max: 64 },
+  status: { type: "enum", required: true, values: ["NEW", "CONFIRMED", "COMPLETED", "CANCELED"] as const },
+  finalPrice: { type: "number", required: false, min: 0, max: 10000, decimals: 2 },
+};
 
 function canTransition(from: ReservationStatus, to: ReservationStatus) {
   const allowed: Record<ReservationStatus, ReservationStatus[]> = {
@@ -25,34 +33,33 @@ function canTransition(from: ReservationStatus, to: ReservationStatus) {
   return allowed[from]?.includes(to) ?? false;
 }
 
-// --- SECURITY HELPERS ---
-function clampString(s: unknown, max: number) {
-  const v = (typeof s === "string" ? s : "").trim();
-  return v.length > max ? v.slice(0, max) : v;
-}
-
-function parseMoney(n: unknown) {
-  const x = Number(n);
-  if (!Number.isFinite(x)) return null;
-  // bounds
-  if (x < 0 || x > 10000) return null;
-  // round to 2 decimals
-  return Math.round(x * 100) / 100;
-}
-
 export async function PATCH(req: Request) {
   try {
-    const body = (await req.json()) as Body;
+    // CSRF protection for browser requests.
+    const originErr = assertSameOrigin(req);
+    if (originErr) return originErr;
 
-    const id = clampString(body?.id, 64);
-    if (!id) {
-      return Response.json({ error: "Missing reservation id." }, { status: 400 });
+    // Rate limit by IP early to reduce auth probing.
+    const ip = getClientIp(req);
+    const ipLimit = await ownerActionRatelimit.limit(`ip:${ip}`);
+    if (!ipLimit.success) {
+      return jsonError(
+        429,
+        "Too many requests. Please wait a bit and try again.",
+        { limit: ipLimit.limit, remaining: ipLimit.remaining, reset: ipLimit.reset },
+        rateLimitHeaders(ipLimit)
+      );
     }
 
+    const raw = await readJson(req, 8_192);
+    const parsed = validateStrict(raw, BodySchema);
+    if (!parsed.ok) {
+      return jsonError(400, parsed.error, parsed.details ? { details: parsed.details } : undefined);
+    }
+
+    const body = parsed.data;
+    const id = body.id;
     const next = body.status;
-    if (!allowedStatuses.has(next)) {
-      return Response.json({ error: "Invalid status." }, { status: 400 });
-    }
 
     const supabase = await createClient();
 
@@ -61,7 +68,18 @@ export async function PATCH(req: Request) {
     const userId = userData?.user?.id;
 
     if (userErr || !userId) {
-      return Response.json({ error: "Not authenticated." }, { status: 401 });
+      return jsonError(401, "Not authenticated.");
+    }
+
+    // Additional user-based throttling (prevents a single account from spamming).
+    const userLimit = await ownerActionRatelimit.limit(`user:${userId}`);
+    if (!userLimit.success) {
+      return jsonError(
+        429,
+        "Too many requests. Please wait a bit and try again.",
+        { limit: userLimit.limit, remaining: userLimit.remaining, reset: userLimit.reset },
+        rateLimitHeaders(userLimit)
+      );
     }
 
     const { data: adminRow, error: adminErr } = await supabase
@@ -71,7 +89,7 @@ export async function PATCH(req: Request) {
       .maybeSingle();
 
     if (adminErr || !adminRow) {
-      return Response.json({ error: "Not authorized." }, { status: 403 });
+      return jsonError(403, "Not authorized.");
     }
 
     // fetch current status so we can enforce transitions server-side
@@ -82,7 +100,7 @@ export async function PATCH(req: Request) {
       .maybeSingle();
 
     if (curErr || !current) {
-      return Response.json({ error: "Reservation not found." }, { status: 404 });
+      return jsonError(404, "Reservation not found.");
     }
 
     const currentStatus = current.status as ReservationStatus;
@@ -92,31 +110,20 @@ export async function PATCH(req: Request) {
     }
 
     if (!canTransition(currentStatus, next)) {
-      return Response.json(
-        { error: `Invalid status change: ${currentStatus} → ${next}` },
-        { status: 400 }
-      );
+      return jsonError(400, `Invalid status change: ${currentStatus} → ${next}`);
     }
 
     const update: Record<string, any> = { status: next };
 
     // final price only allowed when completing
     if (next === "COMPLETED") {
-      const money = parseMoney(body.finalPrice);
-
-      if (money === null) {
-        return Response.json(
-          { error: "finalPrice is required when completing and must be between 0 and 10000." },
-          { status: 400 }
-        );
+      // finalPrice validated by schema, but must be present when completing.
+      if (typeof body.finalPrice !== "number") {
+        return jsonError(400, "finalPrice is required when completing.");
       }
-
-      update.final_price = money; // DB column is snake_case
+      update.final_price = body.finalPrice; // DB column is snake_case
     } else if (typeof body.finalPrice !== "undefined") {
-      return Response.json(
-        { error: "finalPrice can only be provided when status is COMPLETED." },
-        { status: 400 }
-      );
+      return jsonError(400, "finalPrice can only be provided when status is COMPLETED.");
     }
 
     const { data: updated, error: updateErr } = await supabase
@@ -128,12 +135,17 @@ export async function PATCH(req: Request) {
 
     if (updateErr) {
       console.error("Update reservation error:", updateErr);
-      return Response.json({ error: "Failed to update reservation." }, { status: 500 });
+      return jsonError(500, "Failed to update reservation.");
     }
 
     return Response.json({ ok: true, reservation: updated });
   } catch (err) {
     console.error("reservation-status PATCH error:", err);
-    return Response.json({ error: "Invalid request." }, { status: 400 });
+    if (err instanceof Error) {
+      if (err.message === "payload_too_large") return jsonError(413, "Payload too large.");
+      if (err.message === "unsupported_media_type")
+        return jsonError(415, "Unsupported content type. Use application/json.");
+    }
+    return jsonError(400, "Invalid request.");
   }
 }

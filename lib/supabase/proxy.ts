@@ -4,7 +4,18 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function updateSession(request: NextRequest){
     let response = NextResponse.next({request});
 
-    const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const anon =
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!anon) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)"
+      );
+    }
+
+    const supabase = createServerClient(url, anon,
         {
             cookies: {
                 getAll(){
