@@ -39,7 +39,7 @@ A quote-request website for a cleaning business. Customers submit a quote reques
 
 ## Current Status
 
-### ✅ Completed
+### Completed
 
 - Customer quote request page (`/booking`)
   - Service selection with **estimated price range** (min–max)
@@ -90,7 +90,7 @@ A quote-request website for a cleaning business. Customers submit a quote reques
 
 ---
 
-### 🧠 Planned / Next Up
+### Planned / Next Up
 - Dashboard UX polish
   - Improve labels/wording depending on filters/views
   - Cleaner layout/spacing refinements
