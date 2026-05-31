@@ -3,17 +3,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/proxy";
 
-const CANONICAL_HOST = "pattyshousecleaning.vercel.app";
+const realhost = "pattyshousecleaning.vercel.app";
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") || "";
 
   //Allow localhost during development
-  if (!host.startsWith("localhost") && host !== CANONICAL_HOST) {
+  if (!host.startsWith("localhost") && host !== realhost) {
     //redirect any other Vercel alias to the acutal used domain
     const url = request.nextUrl.clone();
     url.protocol = "https:";
-    url.host = CANONICAL_HOST;
+    url.host = realhost;
     return NextResponse.redirect(url, 308);
   }
 
