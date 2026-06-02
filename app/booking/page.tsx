@@ -121,9 +121,9 @@ export default function BookingPage() {
           ? `Quote request submitted! Confirmation code: ${code}. The owner will call/text to confirm and give a quote in person about 1 day in advance.`
           : "Quote request submitted! The owner will call/text to confirm and give a quote in person about 1 day in advance."
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus("error");
-      setMessage(err?.message ?? "Something went wrong.");
+      setMessage(err instanceof Error ? err.message : "Something went wrong.");
     }
   }
 
@@ -134,7 +134,7 @@ export default function BookingPage() {
           {/* Header */}
           <header className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:w-auto rounded-xl border-2 border-transparent bg-[color:var(--card-muted)] px-6 py-4 text-center shadow-sm">
-              <div className="text-sm text-black/70 font-medium">Patricia's House Cleaning</div>
+              <div className="text-sm text-black/70 font-medium">{"Patricia's House Cleaning"}</div>
             </div>
 
             <nav className="w-full sm:w-auto rounded-xl border-2 border-transparent bg-[color:var(--card-muted)] px-4 py-3 shadow-sm">

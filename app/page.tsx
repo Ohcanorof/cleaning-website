@@ -55,12 +55,12 @@ export default async function HomePage({
                   Home
                 </Link>
 
-                <a
+                <Link
                   href="/#services"
                   className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   Services
-                </a>
+                </Link>
 
                 <Link
                   href="/booking"
@@ -69,12 +69,12 @@ export default async function HomePage({
                   Request a Quote
                 </Link>
 
-                <a
+                <Link
                   href="/#about"
                   className="rounded-full border border-black/10 bg-white/70 text-black/70 px-3 py-1 hover:bg-black hover:text-white transition"
                 >
                   About
-                </a>
+                </Link>
               </div>
             </nav>
           </header>

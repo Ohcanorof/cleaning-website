@@ -272,7 +272,7 @@ export async function POST(req: Request) {
   }
 }
 
-async function generateUniqueCode(supabase: any) {
+async function generateUniqueCode(supabase: Awaited<ReturnType<typeof createClient>>) {
   function makeCode() {
     return Math.floor(1000 + Math.random() * 9000).toString(); //4 digits
   }

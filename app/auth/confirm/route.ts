@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { authConfirmRatelimit } from "@/lib/ratelimit";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { getClientIp, rateLimitHeaders, safeNextPath } from "@/lib/security";
 
 /**
@@ -9,6 +10,18 @@ import { getClientIp, rateLimitHeaders, safeNextPath } from "@/lib/security";
  * supports both token_hash + type (verifyOtp) and code (PKCE) (exchangeCodeForSession)
  * after verifying, redirects to `next` (default: /owner/update-password).
  */
+
+function isEmailOtpType(value: string): value is EmailOtpType{
+  return [
+    "signup",
+    "invite",
+    "magiclink",
+    "recovery",
+    "email_change",
+    "email",
+  ].includes(value);
+}
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const origin = url.origin;
@@ -44,8 +57,11 @@ export async function GET(req: Request) {
 
   //roken_hash flow
   if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({
-      type: type as any,
+    if(!isEmailOtpType(type)){
+      return NextResponse.redirect(`${origin}/owner/login?error=invalid_link`)
+    }
+    const {error} = await supabase.auth.verifyOtp({
+      type,
       token_hash,
     });
 
