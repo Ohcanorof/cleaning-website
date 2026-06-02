@@ -14,7 +14,7 @@ type ReservationStatus = "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELED";
 type Body = {
   id: string;
   status: ReservationStatus;
-  finalPrice?: number; // required when status = COMPLETED
+  finalPrice?: number; //required when status = COMPLETED
 };
 
 const BodySchema: Schema<Body> = {
@@ -35,11 +35,11 @@ function canTransition(from: ReservationStatus, to: ReservationStatus) {
 
 export async function PATCH(req: Request) {
   try {
-    // CSRF protection for browser requests.
+    //CSRF protection
     const originErr = assertSameOrigin(req);
     if (originErr) return originErr;
 
-    // Rate limit by IP early to reduce auth probing.
+    //rate limit by IP early to reduce auth probing
     const ip = getClientIp(req);
     const ipLimit = await ownerActionRatelimit.limit(`ip:${ip}`);
     if (!ipLimit.success) {
@@ -63,7 +63,7 @@ export async function PATCH(req: Request) {
 
     const supabase = await createClient();
 
-    // Only admins can update reservation status / final price
+    //only admins can update reservation status/final price
     const { data: userData, error: userErr } = await supabase.auth.getUser();
     const userId = userData?.user?.id;
 
@@ -71,7 +71,7 @@ export async function PATCH(req: Request) {
       return jsonError(401, "Not authenticated.");
     }
 
-    // Additional user-based throttling (prevents a single account from spamming).
+    //userbased throttling
     const userLimit = await ownerActionRatelimit.limit(`user:${userId}`);
     if (!userLimit.success) {
       return jsonError(
@@ -92,7 +92,7 @@ export async function PATCH(req: Request) {
       return jsonError(403, "Not authorized.");
     }
 
-    // fetch current status so we can enforce transitions server-side
+    // etch current status to enfore transitions server side
     const { data: current, error: curErr } = await supabase
       .from("reservations")
       .select("status")
@@ -112,16 +112,22 @@ export async function PATCH(req: Request) {
     if (!canTransition(currentStatus, next)) {
       return jsonError(400, `Invalid status change: ${currentStatus} → ${next}`);
     }
+    
+    type ReservationUpdate = {
+      status: ReservationStatus;
+      final_price?: number;
+    };
 
-    const update: Record<string, any> = { status: next };
+    const update: ReservationUpdate = { status: next };
 
-    // final price only allowed when completing
+    //final price only allowed when completing
     if (next === "COMPLETED") {
-      // finalPrice validated by schema, but must be present when completing.
+      //finalPrice validated by schema but needs to be here for completion
       if (typeof body.finalPrice !== "number") {
         return jsonError(400, "finalPrice is required when completing.");
       }
-      update.final_price = body.finalPrice; // DB column is snake_case
+      update.final_price = body.finalPrice; //DB column is snake_case
+
     } else if (typeof body.finalPrice !== "undefined") {
       return jsonError(400, "finalPrice can only be provided when status is COMPLETED.");
     }

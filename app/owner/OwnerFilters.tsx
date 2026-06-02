@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useMemo, useState} from "react";
 
 //status options
 const OPTIONS = [
@@ -15,21 +15,26 @@ const OPTIONS = [
 
 //sort options
 const SORT_OPTIONS = [
-  {value: "created_desc", label: "Created (newest)"},
-  {value: "created_asc", label: "Created (oldest)"},
-  {value: "requested_asc", label: "Requested date (soonest)"},
-  {value: "requested_desc", label: "Requested date (latest)"},
+  { value: "created_desc", label: "Created (newest)" },
+  { value: "created_asc", label: "Created (oldest)" },
+  { value: "requested_asc", label: "Requested date (soonest)" },
+  { value: "requested_desc", label: "Requested date (latest)" },
 ];
 
-//view options for the list
+//view options for the dashboard
 const VIEW_OPTIONS = [
-  {value: "list", label: "List"},
-  {value: "calendar", label: "Weekly calendar"},
+  { value: "list", label: "List" },
+  { value: "calendar", label: "Weekly calendar" },
 ];
+
+type OwnerFiltersFormProps = {
+  currentStatus: string;
+  currentQ: string;
+  currentSort: string;
+  currentView: string;
+};
 
 export default function OwnerFilters() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const currentStatus = searchParams.get("status") ?? "active";
@@ -37,47 +42,85 @@ export default function OwnerFilters() {
   const currentSort = searchParams.get("sort") ?? "created_desc";
   const currentView = searchParams.get("view") ?? "list";
 
+  return (
+    <OwnerFiltersForm
+      key={searchParams.toString()}
+      currentStatus={currentStatus}
+      currentQ={currentQ}
+      currentSort={currentSort}
+      currentView={currentView}
+    />
+  );
+}
+
+function OwnerFiltersForm({
+  currentStatus,
+  currentQ,
+  currentSort,
+  currentView,
+}: OwnerFiltersFormProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [status, setStatus] = useState(currentStatus);
   const [q, setQ] = useState(currentQ);
   const [sort, setSort] = useState(currentSort);
   const [view, setView] = useState(currentView);
 
-  useEffect(() => setStatus(currentStatus), [currentStatus]);
-  useEffect(() => setQ(currentQ), [currentQ]);
-  useEffect(() => setSort(currentSort), [currentSort]);
-  useEffect(() => setView(currentView), [currentView]);
+  const params = useMemo(
+    () => new URLSearchParams(searchParams.toString()),
+    [searchParams]
+  );
 
-  const params = useMemo(() => new URLSearchParams(searchParams.toString()), [searchParams]);
+  function apply(
+    nextStatus: string,
+    nextQ: string,
+    nextSort: string,
+    nextView: string
+  ) {
+    const updatedParams = new URLSearchParams(params);
 
-  function apply(nextStatus: string, nextQ: string, nextSort: string, nextView: string) {
-    const p = new URLSearchParams(params);
+    //reset pagination when filters change
+    updatedParams.delete("page");
 
-    //reseting the pagination when the time filters change
-    p.delete("page");
-
-    //status
-    if (!nextStatus || nextStatus === "active") p.delete("status");
-    else p.set("status", nextStatus);
+    //status treats "active" as the default
+    if (!nextStatus || nextStatus === "active") {
+      updatedParams.delete("status");
+    } else {
+      updatedParams.set("status", nextStatus);
+    }
 
     //search
-    const trimmed = nextQ.trim();
-    if (!trimmed) p.delete("q");
-    else p.set("q", trimmed);
+    const trimmedSearch = nextQ.trim();
 
-    //sort (treating created_desc as a default)
-    if(!nextSort ||  nextSort === "created_desc") p.delete("sort");
-    else p.set("sort", nextSort);
+    if (!trimmedSearch) {
+      updatedParams.delete("q");
+    } else {
+      updatedParams.set("q", trimmedSearch);
+    }
 
-    //view (treating list as the default)
-    if(!nextView || nextView == "list") p.delete("view");
-    else p.set("view", nextView);
+    // Sort treats "created_desc" as the default
+    if (!nextSort || nextSort === "created_desc") {
+      updatedParams.delete("sort");
+    } else {
+      updatedParams.set("sort", nextSort);
+    }
 
-    const qs = p.toString();
-    router.push(qs ? `${pathname}?${qs}` : pathname);
+    //view treats "list" as default
+    if (!nextView || nextView === "list") {
+      updatedParams.delete("view");
+    } else {
+      updatedParams.set("view", nextView);
+    }
+
+    const queryString = updatedParams.toString();
+
+    router.push(queryString ? `${pathname}?${queryString}` : pathname);
   }
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     apply(status, q, sort, view);
   }
 
@@ -90,26 +133,30 @@ export default function OwnerFilters() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+    <form
+      onSubmit={onSubmit}
+      className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end"
+    >
       <div className="flex-1">
         <label className="block text-xs text-black/60">Search</label>
         <input
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(event) => setQ(event.target.value)}
           placeholder="Name, phone, email, address, code, service..."
-          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"        />
+          className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
+        />
       </div>
 
       <div className="sm:w-72">
         <label className="block text-xs text-black/60">Status</label>
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(event) => setStatus(event.target.value)}
           className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
         >
-          {OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
+          {OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -119,12 +166,12 @@ export default function OwnerFilters() {
         <label className="block text-xs text-black/60">Sort</label>
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
+          onChange={(event) => setSort(event.target.value)}
           className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
         >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
+          {SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -134,12 +181,12 @@ export default function OwnerFilters() {
         <label className="block text-xs text-black/60">View</label>
         <select
           value={view}
-          onChange={(e) => setView(e.target.value)}
+          onChange={(event) => setView(event.target.value)}
           className="mt-1 w-full rounded-lg bg-card px-3 py-2 text-sm text-foreground/80 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-accent/40"
         >
-          {VIEW_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
+          {VIEW_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -148,14 +195,15 @@ export default function OwnerFilters() {
       <div className="flex gap-2">
         <button
           type="submit"
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground hover:opacity-90 transition shadow-sm"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground shadow-sm transition hover:opacity-90"
         >
           Apply
         </button>
+
         <button
           type="button"
           onClick={clear}
-          className="rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground/80 ring-1 ring-black/10 hover:bg-card-muted transition"
+          className="rounded-lg bg-card px-4 py-2 text-sm font-semibold text-foreground/80 ring-1 ring-black/10 transition hover:bg-card-muted"
         >
           Clear
         </button>

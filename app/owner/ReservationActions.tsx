@@ -35,8 +35,8 @@ export default function ReservationActions({
       if (!res.ok) throw new Error(data?.error ?? "Failed to update.");
 
       router.refresh();
-    } catch (e: any) {
-      setErr(e?.message ?? "Something went wrong.");
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
       setLoading(null);
     }

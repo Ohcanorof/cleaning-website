@@ -36,7 +36,7 @@ export default function PhotoCarousel() {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
+    //onSelect(); //fix?
     emblaApi.on("select", onSelect);
     return () => {
       emblaApi.off("select", onSelect);
