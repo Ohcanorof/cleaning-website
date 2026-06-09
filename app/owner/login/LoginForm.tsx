@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {createClient} from "@/lib/supabase/client";
+import {getSiteURL} from "@/lib/siteUrl"
 
 export default function LoginForm({ next }: { next: string }) {
   const [email, setEmail] = useState("");
@@ -47,18 +48,18 @@ export default function LoginForm({ next }: { next: string }) {
       setSendingReset(true);
       const supabase = createClient();
 
-      // Send reset link to email. After clicking, Supabase will redirect to /auth/confirm,
-      // which verifies the token and then routes to /owner/update-password.
-      const { error } = await supabase.auth.resetPasswordForEmail(emailTrimmed, {
-        redirectTo: "https://pattyshousecleaning.vercel.app/auth/confirm?next=/owner/update-password",
-      });
+      //send reset link to email. After clicking, Supabase will redirect to /auth/confirm,
+      //which verifies the token and then routes to /owner/update-password.
+      const siteUrl = getSiteURL();
+      const redirectTo = `${siteUrl}/auth/confirm?next=/owner/update-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(emailTrimmed, {redirectTo,});
 
       if (error) {
         setErr(error.message);
         return;
       }
 
-      setInfo("Password reset email sent. Check your inbox (and spam).");
+      setInfo("Password reset email sent, check your inbox (and spam)!");
     } finally {
       setSendingReset(false);
     }
