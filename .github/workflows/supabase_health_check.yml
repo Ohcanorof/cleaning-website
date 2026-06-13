@@ -1,0 +1,18 @@
+name: Supabase Health Check
+
+on:
+  schedule:
+    #will run every monday and thursday at 15:00 utc automatically, and i can do it manually on github
+    - cron: "0 15 * * 1,4"
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Supabase health check endpoint
+        run: |
+          curl --fail --show-error --silent \
+            -H "x-health-check-secret: ${{ secrets.HEALTH_CHECK_SECRET }}" \
+            "${{ secrets.HEALTH_CHECK_URL }}"
