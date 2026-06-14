@@ -47,10 +47,7 @@ function clamp(v: string, max?: number) {
   return v.length > max ? v.slice(0, max) : v;
 }
 
-export function validateStrict<T extends object>(
-  raw: unknown,
-  schema: Schema<T>
-): ValidationResult<T> {
+export function validateStrict<T extends object>(raw: unknown, schema: Schema<T>): ValidationResult<T> {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
     return { ok: false, error: "Invalid JSON body." };
   }
