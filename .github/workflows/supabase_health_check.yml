@@ -3,6 +3,7 @@ name: Supabase Health Check
 on:
   schedule:
     #will run every day at 15:00 utc automatically, and i can do it manually on github
+    #might change this later.
     - cron: "0 15 * * *"
   workflow_dispatch:
 
